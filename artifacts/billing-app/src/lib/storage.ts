@@ -237,6 +237,10 @@ export const storage = {
     storage.saveCustomers(customers);
     return newCustomer;
   },
+  deleteCustomer: (id: string) => {
+    storage.saveCustomers(storage.getCustomers().filter(c => c.id !== id));
+    storage.saveTransactions(storage.getTransactions().filter(t => t.customerId !== id));
+  },
 
   getTransactions: (): Transaction[] => JSON.parse(localStorage.getItem('billing_transactions') || '[]'),
   saveTransactions: (txns: Transaction[]) => localStorage.setItem('billing_transactions', JSON.stringify(txns)),

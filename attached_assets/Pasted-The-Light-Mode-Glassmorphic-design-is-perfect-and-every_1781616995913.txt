@@ -1,0 +1,19 @@
+The Light-Mode Glassmorphic design is perfect and everything is working smoothly. Let's apply the final enhancements to finish the application structure.
+
+### 🛠️ 1. FIX: DELETE CUSTOMER FUNCTIONALITY (Reference: image_f8cc4e.png)
+- In the Khata Ledger module, add a small, subtle delete/trash icon button next to each customer's profile row in the left-side list, or inside the main profile header next to the customer's name (e.g., next to "Sunita Devi").
+- Clicking this button must trigger a confirmation alert. If confirmed, completely remove that customer profile and their ledger transaction history from the state and update browser localStorage.
+
+### 📊 2. ENHANCEMENT: INTERACTIVE GRAPHS IN REPORTS SECTION
+- Inside the Reports module, implement a visual data section using the standard 'recharts' library.
+- Render a smooth, premium AreaChart or BarChart showing the daily sales performance (Total Cash vs. Total Online sales over time).
+- Match the chart theme perfectly with the existing styling: use clean slate colors for text, with smooth gradients filling the chart area (e.g., Teal/Cyan curves for online sales and Indigo for cash sales) that blend into the white glass panels.
+
+### 🧑‍💻 3. NEW SECTION: "ABOUT DEVELOPER" MODAL
+- Add a new clickable menu item at the bottom left of the sidebar, right underneath "Shop Settings", named "About Developer" or "About Us" with a user/info icon.
+- Clicking this button must open a clean, premium white glassmorphism modal overlay containing:
+  * Founder Profile: Your name and details as the software creator.
+  * Mission Statement: A brief, inspiring note explaining that this platform was built to simplify digital management, eliminate paper tracking, and empower local Indian business owners to move digitally with ease.
+  * A professional, minimalist layout with links or placeholders for your portfolio/contact info.
+
+Ensure all new components maintain state stability, compile cleanly with Vite, and persist any ledger data changes to browser localStorage without errors.

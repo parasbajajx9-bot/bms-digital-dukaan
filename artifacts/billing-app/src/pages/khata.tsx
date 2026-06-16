@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Search, MessageCircle, UserPlus, TrendingUp, TrendingDown, Users } from "lucide-react";
+import { Plus, Search, MessageCircle, UserPlus, TrendingUp, TrendingDown, Users, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,8 @@ export default function KhataPage() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentNote, setPaymentNote] = useState("");
+
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
 
   const reload = () => {
     setCustomers(storage.getCustomers());
@@ -114,6 +116,16 @@ export default function KhataPage() {
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
+  const handleDeleteCustomer = () => {
+    if (!deleteTarget) return;
+    const name = deleteTarget.name;
+    storage.deleteCustomer(deleteTarget.id);
+    toast.success(`${name}'s profile and all transactions removed.`);
+    if (selectedCustomer?.id === deleteTarget.id) setSelectedCustomer(null);
+    setDeleteTarget(null);
+    reload();
+  };
+
   const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -183,28 +195,41 @@ export default function KhataPage() {
             const bal = getBalance(c.id);
             const isSelected = selectedCustomer?.id === c.id;
             return (
-              <button
+              <div
                 key={c.id}
-                className={`w-full text-left p-3 rounded-xl border transition-all duration-150 ${
+                className={`relative group rounded-xl border transition-all duration-150 ${
                   isSelected
                     ? "border-primary/40 bg-primary/8 shadow-sm"
                     : "border-slate-200/60 bg-white/70 hover:bg-white hover:border-slate-300"
                 }`}
-                onClick={() => setSelectedCustomer(c)}
                 data-testid={`customer-card-${c.id}`}
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-sm text-slate-800 truncate max-w-[120px]">{c.name}</span>
-                  <span
-                    className={`text-sm font-bold ${
-                      bal > 0 ? "text-red-600" : bal < 0 ? "text-green-600" : "text-slate-400"
-                    }`}
-                  >
-                    {bal > 0 ? `−₹${bal.toFixed(2)}` : bal < 0 ? `+₹${Math.abs(bal).toFixed(2)}` : "Settled"}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">{c.phone || "No phone"}</p>
-              </button>
+                <button
+                  className="w-full text-left p-3 pr-8"
+                  onClick={() => setSelectedCustomer(c)}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-sm text-slate-800 truncate max-w-[110px]">{c.name}</span>
+                    <span
+                      className={`text-sm font-bold ${
+                        bal > 0 ? "text-red-600" : bal < 0 ? "text-green-600" : "text-slate-400"
+                      }`}
+                    >
+                      {bal > 0 ? `−₹${bal.toFixed(2)}` : bal < 0 ? `+₹${Math.abs(bal).toFixed(2)}` : "Settled"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">{c.phone || "No phone"}</p>
+                </button>
+                {/* Delete button — visible on hover */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
+                  className="absolute top-2.5 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50"
+                  title="Delete customer"
+                  data-testid={`btn-delete-customer-${c.id}`}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             );
           })}
         </div>
@@ -217,7 +242,17 @@ export default function KhataPage() {
             {/* Header */}
             <div className="flex justify-between items-start mb-5 pb-5 border-b border-slate-200/60">
               <div>
-                <h2 className="text-2xl font-extrabold text-slate-800">{selectedCustomer.name}</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-extrabold text-slate-800">{selectedCustomer.name}</h2>
+                  <button
+                    onClick={() => setDeleteTarget(selectedCustomer)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                    title="Delete this customer"
+                    data-testid="btn-delete-selected-customer"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
                 <p className="text-slate-500 text-sm mt-0.5">{selectedCustomer.phone}</p>
                 {selectedCustomer.address && (
                   <p className="text-slate-400 text-xs mt-0.5">{selectedCustomer.address}</p>
@@ -459,6 +494,34 @@ export default function KhataPage() {
               data-testid="btn-save-payment"
             >
               Record Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Customer Confirmation Modal */}
+      <Dialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent className="sm:max-w-sm bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">Delete Customer?</DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-2">
+            <p className="text-slate-600 text-sm">
+              Are you sure you want to permanently delete{" "}
+              <strong>{deleteTarget?.name}</strong>'s profile?
+            </p>
+            <p className="text-red-500 text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              This will also delete all their transaction history and cannot be undone.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteCustomer}
+              data-testid="btn-confirm-delete-customer"
+            >
+              Delete Customer
             </Button>
           </DialogFooter>
         </DialogContent>

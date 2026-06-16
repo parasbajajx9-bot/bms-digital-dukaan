@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Download, TrendingUp, Wallet, CreditCard, AlertCircle, BarChart2 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { Button } from "@/components/ui/button";
 import { storage, Bill } from "@/lib/storage";
 import { toast } from "sonner";
@@ -39,6 +49,51 @@ const rangeLabels: Record<Range, string> = {
   all: "All Time",
 };
 
+type DayData = { date: string; cash: number; online: number; credit: number };
+
+function buildChartData(bills: Bill[], range: Range): DayData[] {
+  const map = new Map<string, DayData>();
+
+  const fmt = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  };
+
+  bills.forEach((b) => {
+    const key = fmt(b.createdAt);
+    const existing = map.get(key) ?? { date: key, cash: 0, online: 0, credit: 0 };
+    if (b.paymentMethod === "cash") existing.cash += b.total;
+    else if (b.paymentMethod === "upi" || b.paymentMethod === "card") existing.online += b.total;
+    else if (b.paymentMethod === "credit") existing.credit += b.total;
+    map.set(key, existing);
+  });
+
+  return Array.from(map.values()).reverse();
+}
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-lg text-sm">
+      <p className="font-bold text-slate-700 mb-1.5">{label}</p>
+      {payload.map((p: any) => (
+        <div key={p.name} className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.color }} />
+          <span className="text-slate-600 capitalize">{p.name}:</span>
+          <span className="font-bold text-slate-800 ml-auto pl-4">₹{Number(p.value).toFixed(2)}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const paymentMethodColor: Record<string, string> = {
+  cash: "bg-green-100 text-green-700",
+  upi: "bg-blue-100 text-blue-700",
+  card: "bg-violet-100 text-violet-700",
+  credit: "bg-red-100 text-red-700",
+};
+
 export default function ReportsPage() {
   const [bills, setBills] = useState<Bill[]>([]);
   const [range, setRange] = useState<Range>("month");
@@ -71,27 +126,17 @@ export default function ReportsPage() {
     .filter((b) => b.gstEnabled)
     .reduce((acc, b) => acc + b.subtotal, 0);
 
+  const chartData = buildChartData(filtered, range);
+
   const exportCSV = () => {
     if (filtered.length === 0) {
       toast.error("No data to export for the selected period.");
       return;
     }
     const headers = [
-      "Bill#",
-      "Date",
-      "Customer",
-      "Items",
-      "Subtotal",
-      "Discount",
-      "GST Enabled",
-      "GST Rate%",
-      "CGST",
-      "SGST",
-      "IGST",
-      "Total GST",
-      "Grand Total",
-      "Payment Method",
-      "Status",
+      "Bill#", "Date", "Customer", "Items", "Subtotal", "Discount",
+      "GST Enabled", "GST Rate%", "CGST", "SGST", "IGST", "Total GST",
+      "Grand Total", "Payment Method", "Status",
     ];
     const rows = filtered.map((b) => [
       b.billNumber,
@@ -124,17 +169,10 @@ export default function ReportsPage() {
     toast.success("Tax report downloaded successfully.");
   };
 
-  const paymentMethodColor: Record<string, string> = {
-    cash: "bg-green-100 text-green-700",
-    upi: "bg-blue-100 text-blue-700",
-    card: "bg-violet-100 text-violet-700",
-    credit: "bg-red-100 text-red-700",
-  };
-
   return (
-    <div className="flex flex-col gap-5 h-full">
+    <div className="flex flex-col gap-4 h-full overflow-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-xl font-extrabold text-slate-800">Reports & Bookkeeping</h1>
           <p className="text-slate-500 text-sm mt-0.5">Financial overview for {rangeLabels[range].toLowerCase()}</p>
@@ -149,7 +187,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Range selector */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap flex-shrink-0">
         {(Object.keys(rangeLabels) as Range[]).map((r) => (
           <button
             key={r}
@@ -167,42 +205,14 @@ export default function ReportsPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 flex-shrink-0">
         {[
-          {
-            label: "Net Revenue",
-            value: `₹${totalRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
-            sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`,
-            color: "text-primary",
-            icon: TrendingUp,
-            bg: "bg-primary/8",
-          },
-          {
-            label: "Cash Sales",
-            value: `₹${cashSales.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
-            sub: `${filtered.filter((b) => b.paymentMethod === "cash").length} bills`,
-            color: "text-green-700",
-            icon: Wallet,
-            bg: "bg-green-50",
-          },
-          {
-            label: "UPI / Card",
-            value: `₹${upiSales.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
-            sub: `${filtered.filter((b) => ["upi", "card"].includes(b.paymentMethod)).length} bills`,
-            color: "text-blue-700",
-            icon: CreditCard,
-            bg: "bg-blue-50",
-          },
-          {
-            label: "Credit (Udhaar)",
-            value: `₹${creditGiven.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
-            sub: `${filtered.filter((b) => b.paymentMethod === "credit").length} bills`,
-            color: "text-red-600",
-            icon: AlertCircle,
-            bg: "bg-red-50",
-          },
+          { label: "Net Revenue", value: `₹${totalRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`, sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`, color: "text-primary", icon: TrendingUp, bg: "bg-primary/8" },
+          { label: "Cash Sales", value: `₹${cashSales.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`, sub: `${filtered.filter((b) => b.paymentMethod === "cash").length} bills`, color: "text-green-700", icon: Wallet, bg: "bg-green-50" },
+          { label: "UPI / Card", value: `₹${upiSales.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`, sub: `${filtered.filter((b) => ["upi", "card"].includes(b.paymentMethod)).length} bills`, color: "text-blue-700", icon: CreditCard, bg: "bg-blue-50" },
+          { label: "Credit (Udhaar)", value: `₹${creditGiven.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`, sub: `${filtered.filter((b) => b.paymentMethod === "credit").length} bills`, color: "text-red-600", icon: AlertCircle, bg: "bg-red-50" },
         ].map((card) => (
-          <div key={card.label} className={`glass-panel p-5`}>
+          <div key={card.label} className="glass-panel p-5">
             <div className={`inline-flex p-2 rounded-lg ${card.bg} mb-3`}>
               <card.icon size={18} className={card.color} />
             </div>
@@ -213,11 +223,99 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+      {/* Sales Chart */}
+      <div className="glass-panel p-5 flex-shrink-0">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Daily Sales Performance</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Cash vs. Online vs. Credit over time</p>
+          </div>
+        </div>
+
+        {chartData.length < 2 ? (
+          <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+            <BarChart2 size={32} className="text-slate-300 mb-2" />
+            <p className="text-sm">Not enough data to draw a chart for this period</p>
+            <p className="text-xs mt-1">Finalize more bills to see trends here</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={chartData} margin={{ top: 4, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gradCash" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.18} />
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradOnline" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.18} />
+                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradCredit" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.14} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `₹${v}`}
+                width={52}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ fontSize: "12px", paddingTop: "8px", color: "#64748b" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="cash"
+                name="Cash"
+                stroke="#6366f1"
+                strokeWidth={2}
+                fill="url(#gradCash)"
+                dot={{ r: 3, fill: "#6366f1", strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: "#6366f1" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="online"
+                name="Online (UPI/Card)"
+                stroke="#06b6d4"
+                strokeWidth={2}
+                fill="url(#gradOnline)"
+                dot={{ r: 3, fill: "#06b6d4", strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: "#06b6d4" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="credit"
+                name="Credit"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fill="url(#gradCredit)"
+                dot={{ r: 3, fill: "#ef4444", strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: "#ef4444" }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* Bills table + GST */}
+      <div className="grid grid-cols-3 gap-4">
         {/* Bills table */}
-        <div className="col-span-2 glass-panel p-5 flex flex-col min-h-0">
+        <div className="col-span-2 glass-panel p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Sales History</h3>
-          <div className="flex-1 overflow-auto min-h-0">
+          <div className="overflow-auto max-h-64">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-white/90 backdrop-blur-sm">
                 <tr className="border-b border-slate-200">
@@ -232,7 +330,7 @@ export default function ReportsPage() {
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-10 text-center">
+                    <td colSpan={6} className="py-8 text-center">
                       <BarChart2 size={28} className="mx-auto text-slate-300 mb-2" />
                       <p className="text-slate-400 text-sm">No bills for this period</p>
                     </td>
@@ -248,25 +346,16 @@ export default function ReportsPage() {
                       >
                         <td className="py-2.5 px-3 font-bold text-primary">{bill.billNumber}</td>
                         <td className="py-2.5 px-3 text-slate-500">
-                          {new Date(bill.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                          })}
+                          {new Date(bill.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                         </td>
                         <td className="py-2.5 px-3 text-slate-700">{bill.customerName || "—"}</td>
                         <td className="py-2.5 px-3 text-center text-slate-500">{bill.items.length}</td>
                         <td className="py-2.5 px-3 text-center">
-                          <span
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${
-                              paymentMethodColor[bill.paymentMethod] ?? "bg-slate-100 text-slate-600"
-                            }`}
-                          >
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${paymentMethodColor[bill.paymentMethod] ?? "bg-slate-100 text-slate-600"}`}>
                             {bill.paymentMethod}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-right font-bold text-slate-800">
-                          ₹{bill.total.toFixed(2)}
-                        </td>
+                        <td className="py-2.5 px-3 text-right font-bold text-slate-800">₹{bill.total.toFixed(2)}</td>
                       </tr>
                     ))
                 )}
@@ -277,13 +366,15 @@ export default function ReportsPage() {
 
         {/* GST Summary */}
         <div className="glass-panel p-5 flex flex-col gap-4">
-          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">GST Summary</h3>
-          <p className="text-xs text-slate-400 -mt-2">For {rangeLabels[range].toLowerCase()}</p>
+          <div>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">GST Summary</h3>
+            <p className="text-xs text-slate-400 mt-0.5">For {rangeLabels[range].toLowerCase()}</p>
+          </div>
 
           <div className="space-y-3">
             {[
               { label: "Taxable Sales", value: taxableSales, color: "text-slate-800" },
-              { label: "Total CGST", value: totalCgst, color: "text-blue-600" },
+              { label: "Total CGST", value: totalCgst, color: "text-indigo-600" },
               { label: "Total SGST", value: totalSgst, color: "text-violet-600" },
               { label: "Total IGST", value: totalIgst, color: "text-orange-500" },
             ].map((row) => (
