@@ -1,0 +1,33 @@
+The layout is visually structured, but the core functionality is completely broken, state persistence is failing, and structural elements are missing. Overhaul the entire codebase to fix the following critical bugs and apply a comprehensive visual re-theme.
+
+### 🎨 CRITICAL RE-THEME: LIGHT-MODE PREMIUM GLASSMORPHISM
+- Change the background color scheme completely from dark blue to a bright, clean, premium Light-Mode.
+- Use a soft, elegant light-grey gradient background (e.g., from slate-50 to zinc-100).
+- Panels and containers must use White Glassmorphism: white backgrounds with semi-transparency (e.g., `bg-white/70` or `bg-white/80`), heavy background blur (`backdrop-blur-md`), and very thin, subtle light borders (`border border-white/40`).
+- Text color must be crisp and readable: Use deep charcoal/slate (`text-slate-800` or `text-zinc-900`) for primary text and headings. Avoid neon text over light panels.
+
+### 🛠️ CRITICAL FUNCTIONAL BUG FIXES
+
+#### 1. Inventory Module Fixes (Reference: image_f953b0.jpg)
+- "+ Add Product" Button: Wire up a functioning modal pop-up overlay. It must allow inputting Product Name, SKU/Barcode, Category, Price, Cost Price, and Initial Stock. Clicking "Save" must instantly add it to the table list.
+- Inline Quantity Adjustments: Ensure the global state updates instantly when clicking the small "+" and "-" buttons next to the item stock counts.
+- Actions (Edit/Delete): Fix the action buttons. Clicking the edit icon must pop up a pre-filled edit modal. Clicking the delete trash icon must trigger a confirmation and remove the item from the state completely.
+
+#### 2. Khata Ledger Module Fixes (Reference: image_f94d01.png)
+- "+" Add Customer Button: Wire up a functional modal pop-up for adding new customers (Inputs: Full Name, Active Phone Number). Saving must append them instantly to the left-side customer ledger list.
+- Financial Adjustment Modals: Fix "+ Log New Udhaar" and "- Record Payment". They must open a modal asking for the entry amount and transaction details. Saving must update that specific customer's active net balance and append a clean log to their history.
+
+#### 3. Billing Terminal & Cart Fixes (Reference: image_f94850.png)
+- Select Item Dropdown & Multi-Item Additions: Fix the dropdown menu so selecting a product and clicking the cyan "+ Add to Bill" button actually pushes that item into the active cart array. Multiple distinct items must be allowed in the same bill.
+- Live Bill Updates: Ensure the right-side invoice panel renders itemized rows dynamically with correct subtotal, calculated GST taxes (when the master toggle is ON), discounts, and final total. 
+- "Cart is Empty" / Finalize Bill Fix: Ensure clicking the "Finalize Bill" button registers the items currently in the active cart state. Once finalized, clear the terminal state, record the transaction metrics in the 'Reports' tab data, and log any 'Credit' selection to the customer's Khata profile automatically.
+- Multi-Format Document Generation: Ensure the "Print" button correctly triggers the compiler to download or preview a cleanly formatted layout using html2pdf.
+
+#### 4. NEW FEATURE: Dynamic Shop Profile Settings Panel
+- Add an explicit settings panel button or an editable configuration gear icon directly in the sidebar or next to the brand name ("Digital Dukaan").
+- This button must open a "Shop Profile Settings" view/modal that allows the shopkeeper to input and modify: 1. Shop Name, 2. Address/Location, 3. Contact Phone Number, and 4. GSTIN (optional).
+- Updating these values must instantly reflect in the header title block of the Right-Side Invoice Panel in the Billing module (replacing "My Digital Dukaan | 123 Main Bazaar").
+
+### 📦 DATA ARCHITECTURE GUARANTEE
+- Ensure all states (Products array, Customers array, Active Cart, Transactions history, and Shop Profile configuration details) are correctly tied together and synchronized using React state or standard storage context hooks.
+- Mirror every state change seamlessly into browser localStorage so that data persists completely when refreshing the page. Do not use uninitialized mock arrays.
