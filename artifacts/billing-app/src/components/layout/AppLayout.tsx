@@ -114,7 +114,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               { label: "Owner Name", key: "ownerName", placeholder: "e.g. Rajesh Sharma" },
               { label: "Address / Location", key: "address", placeholder: "e.g. 12 Gandhi Nagar, Delhi" },
               { label: "Contact Phone", key: "phone", placeholder: "e.g. 9876543210" },
-              { label: "GSTIN (Optional)", key: "gstin", placeholder: "e.g. 22AAAAA0000A1Z5" },
+              { label: "Shop GSTIN (15-Digit Tax ID)", key: "gstin", placeholder: "e.g. 22AAAAA0000A1Z5" },
               { label: "Thank You Message", key: "thankYouMessage", placeholder: "Thank you for shopping with us!" },
             ].map(({ label, key, placeholder }) => (
               <div className="space-y-1.5" key={key}>

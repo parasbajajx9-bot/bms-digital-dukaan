@@ -2,6 +2,7 @@ export type InventoryItem = {
   id: string;
   name: string;
   sku: string;
+  hsnCode?: string;
   sellingPrice: number;
   costPrice: number;
   stock: number;
@@ -31,6 +32,7 @@ export type Transaction = {
 export type BillItem = {
   productId?: string;
   name: string;
+  hsnCode?: string;
   qty: number;
   rate: number;
   discount: number;
@@ -256,10 +258,22 @@ export const storage = {
   saveBills: (bills: Bill[]) => localStorage.setItem('billing_bills', JSON.stringify(bills)),
   addBill: (bill: Omit<Bill, 'id' | 'createdAt' | 'billNumber'>) => {
     const bills = storage.getBills();
-    const billNumber = `INV-${String(bills.length + 1).padStart(4, '0')}`;
+    const billNumber = storage.getNextInvoiceNumber();
     const newBill = { ...bill, id: crypto.randomUUID(), billNumber, createdAt: new Date().toISOString() };
     bills.push(newBill);
     storage.saveBills(bills);
     return newBill;
-  }
+  },
+
+  getNextInvoiceNumber: (): string => {
+    const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
+    const next = counter + 1;
+    localStorage.setItem('billing_invoice_counter', String(next));
+    return `PE-${next}`;
+  },
+
+  peekNextInvoiceNumber: (): string => {
+    const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
+    return `PE-${counter + 1}`;
+  },
 };

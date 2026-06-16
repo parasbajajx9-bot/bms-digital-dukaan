@@ -10,6 +10,7 @@ import { toast } from "sonner";
 type ProductForm = {
   name: string;
   sku: string;
+  hsnCode: string;
   category: string;
   sellingPrice: string;
   costPrice: string;
@@ -20,6 +21,7 @@ type ProductForm = {
 const emptyForm: ProductForm = {
   name: "",
   sku: "",
+  hsnCode: "",
   category: "",
   sellingPrice: "",
   costPrice: "",
@@ -67,6 +69,7 @@ export default function InventoryPage() {
     setForm({
       name: item.name,
       sku: item.sku,
+      hsnCode: item.hsnCode ?? "",
       category: item.category,
       sellingPrice: String(item.sellingPrice),
       costPrice: String(item.costPrice),
@@ -97,6 +100,7 @@ export default function InventoryPage() {
     const data = {
       name: form.name.trim(),
       sku: form.sku.trim() || `SKU-${Date.now()}`,
+      hsnCode: form.hsnCode.trim() || undefined,
       category: form.category.trim() || "General",
       sellingPrice: Number(form.sellingPrice),
       costPrice: Number(form.costPrice),
@@ -316,6 +320,15 @@ export default function InventoryPage() {
                 onChange={(e) => setForm({ ...form, sku: e.target.value })}
                 placeholder="e.g. RICE-5KG"
                 data-testid="input-product-sku"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-slate-700">HSN Code <span className="text-slate-400 font-normal">(Optional)</span></Label>
+              <Input
+                value={form.hsnCode}
+                onChange={(e) => setForm({ ...form, hsnCode: e.target.value })}
+                placeholder="e.g. 1006 (Rice)"
+                data-testid="input-product-hsn"
               />
             </div>
             <div className="space-y-1.5">
