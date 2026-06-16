@@ -1,0 +1,39 @@
+Act as a Senior Full-Stack Developer and UI/UX Designer. Build a desktop-first, highly efficient "All-in-One" Digital Billing, Khata, and Inventory Web Application. The application must be tailored for local, non-tech-savvy vendors using a laptop or desktop computer at their shop counter to eliminate paper registers.
+
+### 🛠️ TECH STACK REQUIREMENTS
+- Frontend: HTML5, Tailwind CSS (for modern UI), vanilla JavaScript (ES6+).
+- Libraries allowed: Lucide Icons (for clean icons), html2pdf.js (for PDF generation), html2canvas (for image generation).
+- Data Persistence: Use browser localStorage to store all invoices, customer khata profiles, and inventory items so the app works instantly without database setups.
+
+### 🎨 VISUAL STYLE & DESKTOP DESK LAYOUT (Glassmorphism & High Efficiency)
+- Design Language: Premium Glassmorphism. Use soft, blurred transparent panels (backdrop-blur-md), subtle white borders, and professional smooth gradients (Deep Indigo/Navy to Teal).
+- Desktop Layout Strategy: A fixed, clean left-side sidebar navigation to switch between 4 core modules: 1. Billing Terminal, 2. Khata Ledger, 3. Inventory Management, 4. Reports & Bookkeeping.
+- Accessibility: Large typography, clean spacing, and clear keyboard-friendly entry fields. Use strong visual hierarchy so the shopkeeper can scan the screen at a glance.
+
+### ⚡ CORE DESKTOP MODULES TO IMPLEMENT
+
+#### 1. Counter-Optimized Billing Terminal (Tab 1 - Dual Panel Layout)
+- Screen Structure: Split the screen into two large panels. 
+  * Left Panel: Quick-add form with a searchable dropdown to pick items from inventory, type quantity, and input discounts.
+  * Right Panel: Live Invoice Preview showing itemized breakdown, automated totals, and GST breakdown.
+- GST Toggle: A prominent, one-click master switch at the top ("Include GST: ON/OFF"). When OFF, instantly hide all tax columns. When ON, automatically calculate and display CGST/SGST/IGST breakdown.
+- Bill Branding: A settings overlay where the vendor can upload a shop logo, type their Shop Name, and customize a "Thank You" message or Terms & Conditions.
+- Multi-Format Export & Sharing: Massive, clear desktop buttons to "Print / Save as PDF", "Download as Image (JPEG)", and a "Share to WhatsApp" button using the Web API to send a pre-formatted text receipt link or summary directly to the customer's phone number.
+
+#### 2. Digital "Khata" Ledger (Tab 2 - Master-Detail Layout)
+- Screen Structure: 
+  * Left Side: A searchable list of all customers with their net balances.
+  * Right Side: A detailed customer ledger displaying complete purchase history, total paid, and a clean chronological list of transaction logs.
+- Udhaar (Credit) Tracker: Distinct color-coding. Use bold green for "Paid/Advance" and clean, urgent red for "Outstanding Udhaar". Include massive, easy-to-click buttons for "+ Log New Udhaar" and "- Record Payment / Settle".
+- One-Click Reminders: A "Send WhatsApp Reminder" button next to pending balances. It must auto-generate a polite text message containing the pending amount and a placeholder for their UPI payment link (e.g., "Dear Customer, a payment of ₹XXXX is pending at [Shop Name]. Please pay via UPI...").
+
+#### 3. Full-Screen Inventory Grid (Tab 3)
+- Product Dashboard: A wide, clean desktop table showing Product Name, Barcode/ID, Selling Price, Cost Price, and Current Stock Count.
+- Quick Adjustments: No complex nested forms. Place big, clear, highly clickable "+" and "-" buttons directly inside the table row next to the stock number for instant on-the-fly updates when new stock arrives.
+- Low-Stock Alerts: Highlight entire rows in a soft red or yellow warning background if stock falls below a customizable threshold (e.g., less than 5 items left).
+
+#### 4. Simple Bookkeeping & Financial Reports (Tab 4)
+- Daily Cash Drawer Log: Large visual cards across the top of the screen showing today's financial metrics: "Total Cash", "Total Online (UPI/Card)", and "Total Credit (Udhaar Given)".
+- One-Click Tax Report: A date-range picker filter (e.g., "This Month", "Last 30 Days") with an "Export Tax Data" button that generates a clean, downloadable spreadsheet/CSV summarizing total taxable sales and GST collected for easy tax filing.
+
+Ensure all code is written beautifully, optimized for desktop screens (1080p and laptop resolutions), contains zero placeholder text, and handles empty fields or edge cases gracefully with user-friendly desktop alert banners.
