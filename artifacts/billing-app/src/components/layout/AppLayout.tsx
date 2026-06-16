@@ -137,82 +137,102 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* About Developer Modal */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white p-0 overflow-hidden">
           <DialogHeader>
             <DialogTitle className="sr-only">About Developer</DialogTitle>
           </DialogHeader>
 
-          {/* Header gradient bar */}
-          <div className="h-1.5 -mx-6 -mt-4 mb-5 rounded-t-xl bg-gradient-to-r from-primary via-cyan-400 to-emerald-400" />
+          {/* Gradient hero banner */}
+          <div className="h-24 bg-gradient-to-br from-primary via-cyan-500 to-emerald-400 relative flex-shrink-0">
+            <div className="absolute inset-0 opacity-20"
+              style={{ backgroundImage: "radial-gradient(circle at 30% 50%, white 1px, transparent 1px), radial-gradient(circle at 70% 80%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+          </div>
 
-          {/* Avatar + name */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center text-white text-2xl font-extrabold select-none shadow-lg">
-              D
-            </div>
-            <div>
-              <p className="text-lg font-extrabold text-slate-800">Digital Dukaan Team</p>
-              <p className="text-sm text-slate-500">Full-Stack Developer · India</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                <span className="text-xs text-emerald-600 font-medium">Open for freelance projects</span>
+          {/* Profile picture — overlaps banner */}
+          <div className="flex flex-col items-center -mt-12 px-7 pb-0">
+            <div className="relative">
+              <img
+                src="/my-profile.jpg"
+                alt="Paras Bajaj"
+                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl"
+                onError={(e) => {
+                  const el = e.currentTarget as HTMLImageElement;
+                  el.style.display = "none";
+                  const fallback = el.nextElementSibling as HTMLElement | null;
+                  if (fallback) fallback.style.display = "flex";
+                }}
+              />
+              {/* Fallback initials avatar — hidden by default, shown if image 404s */}
+              <div
+                className="w-24 h-24 rounded-full border-4 border-white shadow-xl bg-gradient-to-br from-primary to-cyan-400 items-center justify-center text-white text-3xl font-extrabold select-none"
+                style={{ display: "none" }}
+              >
+                PB
               </div>
             </div>
-          </div>
 
-          {/* Mission */}
-          <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4 mb-5">
-            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Our Mission</p>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Digital Dukaan was built to <strong>eliminate paper ledgers and manual billing</strong> for
-              India's 60M+ local shop owners. We believe every kirana store, pharmacy, and small business
-              deserves powerful digital tools — without needing an accountant or internet connection.
-            </p>
-          </div>
-
-          {/* Feature highlights */}
-          <div className="grid grid-cols-2 gap-2 mb-5">
-            {[
-              { emoji: "🧾", label: "GST-Ready Billing" },
-              { emoji: "📒", label: "Khata / Udhaar Ledger" },
-              { emoji: "📦", label: "Inventory Management" },
-              { emoji: "📊", label: "Visual Sales Reports" },
-            ].map((f) => (
-              <div key={f.label} className="flex items-center gap-2 bg-white border border-slate-200/60 rounded-lg px-3 py-2">
-                <span className="text-base">{f.emoji}</span>
-                <span className="text-xs font-medium text-slate-700">{f.label}</span>
+            {/* Name + badges */}
+            <div className="mt-3 text-center">
+              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Paras Bajaj</h2>
+              <div className="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-primary/15 to-cyan-400/15 text-primary border border-primary/30 tracking-wide">
+                  ✦ Founder
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                  BBA · Kanpur
+                </span>
               </div>
-            ))}
+              <p className="text-xs text-slate-500 mt-1.5 leading-snug">
+                Dr. Virendra Swarup Institute of Computer Studies, Kanpur
+              </p>
+            </div>
           </div>
 
-          {/* Links */}
-          <div className="flex gap-2 flex-wrap">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 text-xs font-medium transition-colors"
-            >
-              <Github size={13} /> GitHub
-            </a>
-            <a
-              href="mailto:hello@digitaldukaan.in"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 text-xs font-medium transition-colors"
-            >
-              <Mail size={13} /> Contact
-            </a>
-            <a
-              href="https://digitaldukaan.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 text-xs font-medium transition-colors"
-            >
-              <Globe size={13} /> Website
-            </a>
+          {/* Bio */}
+          <div className="px-7 mt-4">
+            <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                I am a first-year BBA student at Dr. Virendra Swarup Institute of Computer Studies,
+                Kanpur, passionate about financial technology and retail operations. Driven by the desire
+                to help local small-business owners transition away from chaotic paper registers and manual
+                credit (Udhaar) tracking, I designed and co-engineered this smart desktop terminal. This
+                lightweight, premium platform gives everyday retail vendors simple, non-technical tools to
+                manage <strong className="text-slate-700">GST-compliant billing</strong>,{" "}
+                <strong className="text-slate-700">live inventory control</strong>, and{" "}
+                <strong className="text-slate-700">digital ledger tracking</strong> effortlessly.
+              </p>
+            </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs text-slate-400">Version 2.0 · Built with ❤️ in India</p>
+          {/* Social links */}
+          <div className="px-7 mt-4">
+            <div className="flex gap-2">
+              <a
+                href="https://www.linkedin.com/in/paras-bajaj-752174314"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 flex-1 justify-center px-4 py-2.5 rounded-xl border border-[#0A66C2]/30 bg-[#0A66C2]/5 text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 text-sm font-semibold transition-all duration-150"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+                LinkedIn
+              </a>
+              <a
+                href="https://github.com/parasbajajx9-bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 flex-1 justify-center px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-400 text-sm font-semibold transition-all duration-150"
+              >
+                <Github size={16} />
+                GitHub
+              </a>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-7 py-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <p className="text-xs text-slate-400">Digital Dukaan · Built with ❤️ in India</p>
             <Button size="sm" variant="outline" onClick={() => setAboutOpen(false)}>Close</Button>
           </div>
         </DialogContent>
