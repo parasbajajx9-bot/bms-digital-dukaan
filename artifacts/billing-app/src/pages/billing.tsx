@@ -214,10 +214,12 @@ export default function BillingPage() {
                 <Label className="text-slate-700 text-sm">Discount</Label>
                 <button
                   onClick={() => { setDiscountMode(m => m === "pct" ? "flat" : "pct"); setItemDiscount(0); }}
-                  className="flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-md border transition-colors bg-white border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary"
-                  title="Toggle discount type"
+                  className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors bg-white border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary"
+                  title="Toggle discount type: percentage or flat amount"
                 >
-                  {discountMode === "pct" ? <><Percent size={10} /> %</> : <><IndianRupee size={10} /> Flat</>}
+                  {discountMode === "pct"
+                    ? <><Percent size={10} /><span>Percent</span></>
+                    : <><IndianRupee size={10} /><span>Flat</span></>}
                 </button>
               </div>
               <div className="relative">

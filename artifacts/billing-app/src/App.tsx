@@ -9,6 +9,7 @@ import BillingPage from "@/pages/billing";
 import KhataPage from "@/pages/khata";
 import InventoryPage from "@/pages/inventory";
 import ReportsPage from "@/pages/reports";
+import InvoicesPage from "@/pages/invoices";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ function Router() {
       <Switch>
         <Route path="/" component={() => <Redirect to="/billing" />} />
         <Route path="/billing" component={BillingPage} />
+        <Route path="/invoices" component={InvoicesPage} />
         <Route path="/khata" component={KhataPage} />
         <Route path="/inventory" component={InventoryPage} />
         <Route path="/reports" component={ReportsPage} />

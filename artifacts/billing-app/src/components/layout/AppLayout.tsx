@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github,
+  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github, FileText,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { path: "/billing", label: "Billing Terminal", icon: Calculator },
+    { path: "/invoices", label: "Invoices", icon: FileText },
     { path: "/khata", label: "Khata Ledger", icon: BookOpen },
     { path: "/inventory", label: "Inventory", icon: PackageSearch },
     { path: "/reports", label: "Reports", icon: BarChart3 },
@@ -247,10 +248,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="px-7 mt-4">
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
               <p className="text-sm text-slate-600 leading-relaxed">
-                I am a first-year BBA student at Dr. Virendra Swarup Institute of Computer Studies,
-                Kanpur, passionate about financial technology and retail operations. Driven by the desire
-                to help local small-business owners transition away from chaotic paper registers and manual
-                credit (Udhaar) tracking, I designed and co-engineered this smart desktop terminal. This
+                I am a BBA student at Dr. Virendra Swarup Institute of Computer Studies (VSICS), Kanpur,
+                passionate about financial technology and retail operations. Driven by the desire to help
+                local small-business owners transition away from chaotic paper registers and manual credit
+                (Udhaar) tracking, I designed and co-engineered this smart desktop terminal. This
                 lightweight, premium platform gives everyday retail vendors simple, non-technical tools to
                 manage <strong className="text-slate-700">GST-compliant billing</strong>,{" "}
                 <strong className="text-slate-700">live inventory control</strong>, and{" "}

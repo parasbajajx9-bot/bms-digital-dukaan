@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Minus, Edit, Trash2, Package } from "lucide-react";
+import { Plus, Search, Minus, Edit, Trash2, Package, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { storage, InventoryItem, formatCurrency } from "@/lib/storage";
 import { useShopSettings } from "@/lib/useShopSettings";
@@ -19,7 +20,13 @@ const emptyForm: ProductForm = {
 };
 
 export default function InventoryPage() {
-  const { settings } = useShopSettings();
+  const { settings, saveSettings } = useShopSettings();
+
+  const toggleGst = () => {
+    const next = !settings.globalGstEnabled;
+    saveSettings({ ...settings, globalGstEnabled: next });
+    toast.success(next ? "GST features enabled — HSN codes & tax fields are now active." : "GST features disabled — HSN codes hidden for simpler billing.");
+  };
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -113,8 +120,8 @@ export default function InventoryPage() {
 
   return (
     <div className="flex flex-col gap-5 h-full">
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      {/* Stats + GST Quick Toggle */}
+      <div className="grid grid-cols-5 gap-4">
         {[
           { label: "Total Products", value: items.length, color: "text-slate-800" },
           { label: "Low Stock", value: lowStockCount, color: "text-amber-600" },
@@ -126,6 +133,29 @@ export default function InventoryPage() {
             <p className={`text-2xl font-extrabold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
+
+        {/* GST Quick Toggle — 5th card */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={toggleGst}
+          onKeyDown={e => e.key === "Enter" && toggleGst()}
+          className={`glass-panel p-5 text-left transition-all duration-200 hover:shadow-md cursor-pointer select-none ${settings.globalGstEnabled ? "border-primary/30 bg-primary/5" : "border-slate-200/60"}`}
+        >
+          <div className="flex items-start justify-between mb-3">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${settings.globalGstEnabled ? "bg-primary/15" : "bg-slate-100"}`}>
+              <Zap size={15} className={settings.globalGstEnabled ? "text-primary" : "text-slate-400"} />
+            </div>
+            <Switch checked={settings.globalGstEnabled} onCheckedChange={toggleGst} onClick={e => e.stopPropagation()} />
+          </div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">GST Features</p>
+          <p className={`text-lg font-extrabold ${settings.globalGstEnabled ? "text-primary" : "text-slate-400"}`}>
+            {settings.globalGstEnabled ? "Enabled" : "Disabled"}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5 leading-tight">
+            {settings.globalGstEnabled ? "HSN & tax fields active" : "Tap to enable tax billing"}
+          </p>
+        </div>
       </div>
 
       {/* Main table */}
