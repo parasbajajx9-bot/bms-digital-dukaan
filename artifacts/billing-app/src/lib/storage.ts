@@ -71,7 +71,8 @@ export type Bill = {
   igst: number;
   total: number;
   paymentMethod: 'cash' | 'upi' | 'card' | 'credit';
-  status: 'paid' | 'credit';
+  status: 'paid' | 'credit' | 'cancelled';
+  cancelledAt?: string;
   shopSettings: ShopSettings;
   createdAt: string;
 };
@@ -288,6 +289,30 @@ export const storage = {
 
   getBills: (): Bill[] => JSON.parse(localStorage.getItem('billing_bills') || '[]'),
   saveBills: (bills: Bill[]) => localStorage.setItem('billing_bills', JSON.stringify(bills)),
+
+  // Cancel a bill: mark as cancelled, restore inventory stock
+  cancelBill: (id: string) => {
+    const bills = storage.getBills();
+    const bill = bills.find(b => b.id === id);
+    if (!bill || bill.status === 'cancelled') return false;
+    bill.status = 'cancelled';
+    bill.cancelledAt = new Date().toISOString();
+    storage.saveBills(bills);
+    // Restore inventory stock for each item
+    const inventory = storage.getInventory();
+    let changed = false;
+    bill.items.forEach(billItem => {
+      if (!billItem.productId) return;
+      const inv = inventory.find(i => i.id === billItem.productId);
+      if (inv) { inv.stock += billItem.qty; changed = true; }
+    });
+    if (changed) {
+      storage.saveInventory(inventory);
+      window.dispatchEvent(new Event('inventory-updated'));
+    }
+    return true;
+  },
+
   addBill: (bill: Omit<Bill, 'id' | 'createdAt' | 'billNumber'>) => {
     const bills = storage.getBills();
     const billNumber = storage.getNextInvoiceNumber();

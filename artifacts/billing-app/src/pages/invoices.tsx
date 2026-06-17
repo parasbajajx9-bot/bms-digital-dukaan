@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Search, FileText, Eye, Printer, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, FileText, Eye, Printer, X, ChevronDown, ChevronUp, Ban, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { storage, Bill, formatCurrency } from "@/lib/storage";
 import { useShopSettings } from "@/lib/useShopSettings";
+import { toast } from "sonner";
 
 type SortField = "date" | "billNumber" | "total";
 type SortDir = "asc" | "desc";
@@ -26,12 +29,28 @@ export default function InvoicesPage() {
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Bill | null>(null);
 
-  useEffect(() => { setBills(storage.getBills()); }, []);
+  const reload = () => setBills(storage.getBills());
+  useEffect(() => { reload(); }, []);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc");
     else { setSortField(field); setSortDir("desc"); }
+  };
+
+  const handleCancel = () => {
+    if (!cancelTarget) return;
+    const ok = storage.cancelBill(cancelTarget.id);
+    if (ok) {
+      toast.success(`${cancelTarget.billNumber} cancelled. Stock restored.`);
+    } else {
+      toast.error("Could not cancel this invoice.");
+    }
+    reload();
+    // If the detail modal was open for this bill, close it
+    if (selectedBill?.id === cancelTarget.id) setSelectedBill(null);
+    setCancelTarget(null);
   };
 
   const filtered = bills
@@ -50,13 +69,23 @@ export default function InvoicesPage() {
       return sortDir === "asc" ? cmp : -cmp;
     });
 
-  const totalRevenue = filtered.reduce((s, b) => s + b.total, 0);
-  const pendingCredit = filtered.filter(b => b.status === "credit").reduce((s, b) => s + b.total, 0);
-  const paidCount = filtered.filter(b => b.status === "paid").length;
+  const activeBills = bills.filter(b => b.status !== "cancelled");
+  const totalRevenue = activeBills.reduce((s, b) => s + b.total, 0);
+  const pendingCredit = activeBills.filter(b => b.status === "credit").reduce((s, b) => s + b.total, 0);
+  const paidCount = activeBills.filter(b => b.status === "paid").length;
+  const cancelledCount = bills.filter(b => b.status === "cancelled").length;
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ChevronDown size={12} className="opacity-30" />;
     return sortDir === "asc" ? <ChevronUp size={12} className="text-primary" /> : <ChevronDown size={12} className="text-primary" />;
+  };
+
+  const statusBadge = (status: Bill["status"]) => {
+    if (status === "cancelled")
+      return <span className="text-xs font-bold px-2.5 py-1 rounded-full border bg-slate-100 text-slate-500 border-slate-200 line-through">Cancelled</span>;
+    if (status === "paid")
+      return <span className="text-xs font-bold px-2.5 py-1 rounded-full border bg-emerald-50 text-emerald-600 border-emerald-200">Paid</span>;
+    return <span className="text-xs font-bold px-2.5 py-1 rounded-full border bg-red-50 text-red-600 border-red-200">Credit</span>;
   };
 
   return (
@@ -64,10 +93,10 @@ export default function InvoicesPage() {
       {/* Stats row */}
       <div className="grid grid-cols-4 gap-4 flex-shrink-0">
         {[
-          { label: "Total Bills", value: bills.length.toString(), sub: `${filtered.length} shown`, color: "text-slate-800" },
-          { label: "Filtered Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${filtered.length} bills`, color: "text-primary" },
+          { label: "Active Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${activeBills.length} active bills`, color: "text-primary" },
           { label: "Paid Bills", value: paidCount.toString(), sub: "Settled", color: "text-emerald-600" },
-          { label: "Credit Pending", value: formatCurrency(pendingCredit, settings.currency), sub: `${filtered.filter(b => b.status === "credit").length} bills`, color: "text-red-600" },
+          { label: "Credit Pending", value: formatCurrency(pendingCredit, settings.currency), sub: `${activeBills.filter(b => b.status === "credit").length} bills`, color: "text-red-600" },
+          { label: "Cancelled", value: cancelledCount.toString(), sub: "Stock restored", color: "text-slate-500" },
         ].map(s => (
           <div key={s.label} className="glass-panel p-5">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{s.label}</p>
@@ -83,7 +112,7 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-3 mb-5 flex-shrink-0">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <Input className="pl-9 bg-white h-9 text-sm" placeholder="Search bill # or customer name…" value={search} onChange={e => setSearch(e.target.value)} />
+            <Input className="pl-9 bg-white h-9 text-sm" placeholder="Search bill # or customer…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <select value={filterPM} onChange={e => setFilterPM(e.target.value)}
             className="h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
@@ -98,6 +127,7 @@ export default function InvoicesPage() {
             <option value="">All Status</option>
             <option value="paid">Paid</option>
             <option value="credit">Credit</option>
+            <option value="cancelled">Cancelled</option>
           </select>
           {(search || filterPM || filterStatus) && (
             <button onClick={() => { setSearch(""); setFilterPM(""); setFilterStatus(""); }}
@@ -121,7 +151,7 @@ export default function InvoicesPage() {
                   { label: "Payment", field: null, align: "center" },
                   { label: "Status", field: null, align: "center" },
                   { label: "Total", field: "total" as SortField, align: "right" },
-                  { label: "", field: null, align: "right" },
+                  { label: "Actions", field: null, align: "right" },
                 ].map(({ label, field, align }) => (
                   <th key={label}
                     className={`py-3 px-3 font-semibold text-slate-500 text-xs uppercase tracking-wide text-${align} ${field ? "cursor-pointer select-none hover:text-primary transition-colors" : ""}`}
@@ -143,50 +173,73 @@ export default function InvoicesPage() {
                     <p className="text-slate-300 text-xs mt-1">Try adjusting your search or filters above</p>
                   </td>
                 </tr>
-              ) : filtered.map(bill => (
-                <tr key={bill.id}
-                  className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group"
-                  onClick={() => setSelectedBill(bill)}>
-                  <td className="py-3.5 px-3">
-                    <span className="font-bold text-primary font-mono text-xs bg-primary/8 border border-primary/15 px-2 py-1 rounded-md">
-                      {bill.billNumber}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-3 text-slate-600">
-                    <p className="font-medium text-slate-800">{new Date(bill.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
-                    <p className="text-xs text-slate-400">{new Date(bill.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</p>
-                  </td>
-                  <td className="py-3.5 px-3">
-                    {bill.customerName
-                      ? <span className="font-medium text-slate-800">{bill.customerName}</span>
-                      : <span className="text-slate-400 italic text-xs">Walk-in Customer</span>}
-                  </td>
-                  <td className="py-3.5 px-3 text-center">
-                    <span className="text-slate-500 text-xs bg-slate-100 px-2 py-0.5 rounded-full font-semibold">
-                      {bill.items.length} item{bill.items.length !== 1 ? "s" : ""}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-3 text-center">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${PM_STYLE[bill.paymentMethod] ?? "bg-slate-100 text-slate-600"}`}>
-                      {PM_LABEL[bill.paymentMethod] ?? bill.paymentMethod}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-3 text-center">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${bill.status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-red-50 text-red-600 border-red-200"}`}>
-                      {bill.status === "paid" ? "Paid" : "Credit"}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-3 text-right">
-                    <span className="font-extrabold text-slate-800">{formatCurrency(bill.total, settings.currency)}</span>
-                    {bill.discount > 0 && <p className="text-xs text-green-600">−{formatCurrency(bill.discount, settings.currency)} disc</p>}
-                  </td>
-                  <td className="py-3.5 px-3 text-right">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1 text-xs text-primary font-semibold">
-                      <Eye size={13} /> View
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              ) : filtered.map(bill => {
+                const isCancelled = bill.status === "cancelled";
+                return (
+                  <tr key={bill.id}
+                    className={`border-b border-slate-50 transition-colors ${isCancelled ? "bg-slate-50/60 opacity-60" : "hover:bg-slate-50/70 cursor-pointer group"}`}
+                    onClick={!isCancelled ? () => setSelectedBill(bill) : undefined}>
+                    <td className="py-3.5 px-3">
+                      <span className={`font-bold font-mono text-xs px-2 py-1 rounded-md border ${isCancelled ? "bg-slate-100 text-slate-400 border-slate-200" : "bg-primary/8 text-primary border-primary/15"}`}>
+                        {bill.billNumber}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 text-slate-600">
+                      <p className="font-medium text-slate-800">{new Date(bill.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
+                      <p className="text-xs text-slate-400">{new Date(bill.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</p>
+                    </td>
+                    <td className="py-3.5 px-3">
+                      {bill.customerName
+                        ? <span className="font-medium text-slate-800">{bill.customerName}</span>
+                        : <span className="text-slate-400 italic text-xs">Walk-in Customer</span>}
+                    </td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className="text-slate-500 text-xs bg-slate-100 px-2 py-0.5 rounded-full font-semibold">
+                        {bill.items.length} item{bill.items.length !== 1 ? "s" : ""}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${PM_STYLE[bill.paymentMethod] ?? "bg-slate-100 text-slate-600"}`}>
+                        {PM_LABEL[bill.paymentMethod] ?? bill.paymentMethod}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 text-center">{statusBadge(bill.status)}</td>
+                    <td className="py-3.5 px-3 text-right">
+                      <span className={`font-extrabold ${isCancelled ? "text-slate-400 line-through" : "text-slate-800"}`}>
+                        {formatCurrency(bill.total, settings.currency)}
+                      </span>
+                      {bill.discount > 0 && !isCancelled && (
+                        <p className="text-xs text-green-600">−{formatCurrency(bill.discount, settings.currency)} disc</p>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-3 text-right" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1">
+                        {!isCancelled && (
+                          <button
+                            onClick={() => setSelectedBill(bill)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/8"
+                            title="View receipt"
+                          >
+                            <Eye size={14} />
+                          </button>
+                        )}
+                        {!isCancelled && (
+                          <button
+                            onClick={() => setCancelTarget(bill)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            title="Cancel invoice"
+                          >
+                            <Ban size={14} />
+                          </button>
+                        )}
+                        {isCancelled && (
+                          <span className="text-xs text-slate-400 italic pr-1">Voided</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -196,28 +249,31 @@ export default function InvoicesPage() {
       {selectedBill && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setSelectedBill(null)}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
-            {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <span className="font-bold text-primary font-mono bg-primary/10 px-3 py-1.5 rounded-lg text-sm">{selectedBill.billNumber}</span>
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${selectedBill.status === "paid" ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-red-50 text-red-600 border-red-200"}`}>
-                  {selectedBill.status === "paid" ? "Paid" : "Credit / Udhaar"}
-                </span>
+                {statusBadge(selectedBill.status)}
               </div>
               <div className="flex items-center gap-2">
+                {selectedBill.status !== "cancelled" && (
+                  <button
+                    onClick={() => { setCancelTarget(selectedBill); setSelectedBill(null); }}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Ban size={12} /> Cancel Invoice
+                  </button>
+                )}
                 <button onClick={() => window.print()}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
                   <Printer size={13} /> Print
                 </button>
-                <button onClick={() => setSelectedBill(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+                <button onClick={() => setSelectedBill(null)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                   <X size={16} />
                 </button>
               </div>
             </div>
 
             <div className="flex-1 overflow-auto p-6">
-              {/* Shop & Customer info */}
               <div className="text-center pb-4 mb-4 border-b border-dashed border-slate-200">
                 <p className="text-lg font-extrabold text-slate-900">{selectedBill.shopSettings.shopName}</p>
                 <p className="text-xs text-slate-500 mt-0.5">{selectedBill.shopSettings.address}</p>
@@ -239,7 +295,6 @@ export default function InvoicesPage() {
                 </div>
               </div>
 
-              {/* Items */}
               <div className="border border-slate-100 rounded-xl overflow-hidden mb-4">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50">
@@ -266,7 +321,6 @@ export default function InvoicesPage() {
                 </table>
               </div>
 
-              {/* Totals */}
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-slate-600">
                   <span>Subtotal</span><span>{formatCurrency(selectedBill.subtotal, settings.currency)}</span>
@@ -298,7 +352,6 @@ export default function InvoicesPage() {
                 </div>
               </div>
 
-              {/* Footer */}
               <p className="text-center text-xs text-slate-400 mt-5 pt-4 border-t border-dashed border-slate-200">
                 {selectedBill.shopSettings.thankYouMessage}
               </p>
@@ -306,6 +359,43 @@ export default function InvoicesPage() {
           </div>
         </div>
       )}
+
+      {/* Cancel Confirmation Modal */}
+      <Dialog open={cancelTarget !== null} onOpenChange={open => !open && setCancelTarget(null)}>
+        <DialogContent className="sm:max-w-sm bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={16} className="text-red-600" />
+              </div>
+              Cancel Invoice?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-3">
+            <p className="text-slate-600 text-sm">
+              You are about to cancel{" "}
+              <strong className="text-slate-800">{cancelTarget?.billNumber}</strong>
+              {cancelTarget?.customerName ? ` for ${cancelTarget.customerName}` : ""}{" "}
+              worth <strong className="text-slate-800">{cancelTarget && formatCurrency(cancelTarget.total, settings.currency)}</strong>.
+            </p>
+            <div className="bg-amber-50 border border-amber-200/60 rounded-xl px-4 py-3 space-y-1.5">
+              <p className="text-amber-700 text-xs font-semibold">What happens next</p>
+              <ul className="text-amber-600 text-xs space-y-1 list-disc list-inside">
+                <li>Invoice stays on record as <strong>Cancelled</strong></li>
+                <li>Inventory stock is automatically restored</li>
+                <li>Revenue excluded from Reports dashboard</li>
+                <li>This action cannot be undone</li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelTarget(null)}>Keep Invoice</Button>
+            <Button variant="destructive" onClick={handleCancel} className="gap-1.5">
+              <Ban size={14} /> Cancel Invoice
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

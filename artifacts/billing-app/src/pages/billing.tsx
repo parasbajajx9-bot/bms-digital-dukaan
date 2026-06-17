@@ -208,20 +208,21 @@ export default function BillingPage() {
               <Label className="text-slate-700 text-sm">Qty</Label>
               <Input type="number" min="1" value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value)))} className="bg-white" />
             </div>
-            <div className="space-y-1.5 flex-1">
-              {/* Dual discount: % or flat toggle */}
-              <div className="flex items-center justify-between">
-                <Label className="text-slate-700 text-sm">Discount</Label>
+            <div className="flex-1 flex flex-col gap-1.5">
+              {/* Label row */}
+              <div className="flex items-center justify-between h-5">
+                <Label className="text-slate-700 text-sm leading-none">Discount</Label>
                 <button
                   onClick={() => { setDiscountMode(m => m === "pct" ? "flat" : "pct"); setItemDiscount(0); }}
-                  className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border transition-colors bg-white border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary"
-                  title="Toggle discount type: percentage or flat amount"
+                  className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded border transition-colors bg-white border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary leading-none"
+                  title="Toggle: percentage or flat amount"
                 >
                   {discountMode === "pct"
-                    ? <><Percent size={10} /><span>Percent</span></>
-                    : <><IndianRupee size={10} /><span>Flat</span></>}
+                    ? <><Percent size={9} /><span>%</span></>
+                    : <><IndianRupee size={9} /><span>Flat</span></>}
                 </button>
               </div>
+              {/* Input with suffix */}
               <div className="relative">
                 <Input
                   type="number"
@@ -229,10 +230,10 @@ export default function BillingPage() {
                   max={discountMode === "pct" ? 100 : undefined}
                   value={itemDiscount}
                   onChange={(e) => setItemDiscount(Number(e.target.value))}
-                  className="bg-white pr-7"
-                  placeholder={discountMode === "pct" ? "0" : "0.00"}
+                  className="bg-white pr-8"
+                  placeholder="0"
                 />
-                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none select-none">
                   {discountMode === "pct" ? "%" : sym}
                 </span>
               </div>

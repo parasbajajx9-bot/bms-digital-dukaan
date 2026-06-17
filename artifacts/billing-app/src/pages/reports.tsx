@@ -92,7 +92,9 @@ export default function ReportsPage() {
   }, []);
 
   const startDate = getStartDate(range);
-  const filtered = startDate ? bills.filter(b => new Date(b.createdAt) >= startDate) : bills;
+  // Always exclude cancelled bills from all financial calculations
+  const filtered = (startDate ? bills.filter(b => new Date(b.createdAt) >= startDate) : bills)
+    .filter(b => b.status !== 'cancelled');
 
   const totalRevenue = filtered.reduce((acc, b) => acc + b.total, 0);
   const cashSales = filtered.filter(b => b.paymentMethod === "cash").reduce((acc, b) => acc + b.total, 0);

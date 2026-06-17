@@ -38,23 +38,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-full overflow-hidden text-foreground">
       <div className="w-60 flex-shrink-0 sidebar-glass h-full flex flex-col pt-6 z-10">
-        {/* Shop name / settings trigger */}
-        <button
-          onClick={handleOpenSettings}
-          className="px-6 mb-8 text-left group w-full"
-          data-testid="btn-open-settings"
-        >
+        {/* Shop identity (non-clickable — use Shop Settings in the sidebar) */}
+        <div className="px-6 mb-8">
           <div className="flex items-center gap-2">
-            <Store size={20} className="text-primary" />
-            <div>
-              <h1 className="text-base font-bold text-slate-800 leading-tight group-hover:text-primary transition-colors truncate max-w-[140px]">
+            <Store size={20} className="text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base font-bold text-slate-800 leading-tight truncate max-w-[160px]">
                 {settings.shopName}
               </h1>
-              <p className="text-xs text-slate-500 truncate max-w-[140px]">{settings.ownerName}</p>
+              <p className="text-xs text-slate-500 truncate max-w-[160px]">{settings.ownerName}</p>
             </div>
-            <Settings size={14} className="ml-auto text-slate-400 group-hover:text-primary transition-colors flex-shrink-0" />
           </div>
-        </button>
+        </div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 space-y-1">
@@ -248,12 +243,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="px-7 mt-4">
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
               <p className="text-sm text-slate-600 leading-relaxed">
-                I am a BBA student at Dr. Virendra Swarup Institute of Computer Studies (VSICS), Kanpur,
-                passionate about financial technology and retail operations. Driven by the desire to help
-                local small-business owners transition away from chaotic paper registers and manual credit
-                (Udhaar) tracking, I designed and co-engineered this smart desktop terminal. This
-                lightweight, premium platform gives everyday retail vendors simple, non-technical tools to
-                manage <strong className="text-slate-700">GST-compliant billing</strong>,{" "}
+                Driven by the desire to help local small-business owners transition away from chaotic
+                paper registers and manual credit (Udhaar) tracking, I designed and co-engineered this
+                smart desktop terminal. This lightweight, premium platform gives everyday retail vendors
+                simple, non-technical tools to manage{" "}
+                <strong className="text-slate-700">GST-compliant billing</strong>,{" "}
                 <strong className="text-slate-700">live inventory control</strong>, and{" "}
                 <strong className="text-slate-700">digital ledger tracking</strong> effortlessly.
               </p>
