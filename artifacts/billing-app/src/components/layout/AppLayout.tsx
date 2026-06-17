@@ -19,10 +19,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { path: "/billing", label: "Billing Terminal", icon: Calculator },
-    { path: "/invoices", label: "Invoices", icon: FileText },
-    { path: "/khata", label: "Khata Ledger", icon: BookOpen },
     { path: "/inventory", label: "Inventory", icon: PackageSearch },
+    { path: "/invoices", label: "Invoices", icon: FileText },
     { path: "/reports", label: "Reports", icon: BarChart3 },
+    { path: "/khata", label: "Khata Ledger", icon: BookOpen },
   ];
 
   const handleOpenSettings = () => {

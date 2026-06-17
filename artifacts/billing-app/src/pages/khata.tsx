@@ -115,16 +115,47 @@ export default function KhataPage() {
     return bal > 0 ? acc + bal : acc;
   }, 0);
 
+  const now = new Date();
+  const collectedThisMonth = transactions
+    .filter(t => {
+      if (t.type !== "payment") return false;
+      const d = new Date(t.date);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    })
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const customersWithBalance = customers.filter(c => getBalance(c.id) > 0).length;
+
   return (
-    <div className="flex gap-5 h-full">
+    <div className="flex flex-col gap-4 h-full">
+
+      {/* ── KPI Summary Bar ── */}
+      <div className="grid grid-cols-2 gap-4 flex-shrink-0">
+        <div className="glass-panel px-6 py-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+            <TrendingDown size={18} className="text-red-600" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Total Credit Outstanding</p>
+            <p className="text-2xl font-extrabold text-red-600 leading-none">{formatCurrency(totalOutstanding, settings.currency)}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{customersWithBalance} customer{customersWithBalance !== 1 ? "s" : ""} with pending balance</p>
+          </div>
+        </div>
+        <div className="glass-panel px-6 py-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+            <TrendingUp size={18} className="text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Collected This Month</p>
+            <p className="text-2xl font-extrabold text-emerald-600 leading-none">{formatCurrency(collectedThisMonth, settings.currency)}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{new Date().toLocaleString("en-IN", { month: "long", year: "numeric" })}</p>
+          </div>
+        </div>
+      </div>
+
+    <div className="flex gap-5 flex-1 min-h-0">
       {/* ── Left: Customer List ── */}
       <div className="w-72 flex-shrink-0 glass-panel p-4 flex flex-col gap-3">
-        <div className="bg-red-50/70 border border-red-200/60 rounded-xl px-4 py-3">
-          <p className="text-xs font-semibold text-red-500 uppercase tracking-wide">Total Outstanding</p>
-          <p className="text-2xl font-extrabold text-red-600">{formatCurrency(totalOutstanding, settings.currency)}</p>
-          <p className="text-xs text-red-400">{customers.length} customers</p>
-        </div>
-
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
@@ -375,6 +406,7 @@ export default function KhataPage() {
           {receiptBill && <MiniReceipt bill={receiptBill} currency={settings.currency} />}
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }
