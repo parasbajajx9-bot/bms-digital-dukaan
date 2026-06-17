@@ -1,0 +1,32 @@
+Please help me update and optimize my GST Billing and Bookkeeping app based on the following feature requirements and bug fixes. Make all changes directly in the code files:
+
+1. FIX LEDGER-REPORT SYNC (SUSPENSE ACCOUNT):
+- When a customer is deleted from the Khata Ledger, DO NOT delete their sales data from the Reports or Dashboard.
+- Instead, re-assign those historical sales and bills to a default placeholder named "Unknown / Suspense Account". This keeps our total Net Revenue math completely accurate while clearing out the customer's personal profile.
+
+2. MINI-RECEIPT SLIP FOR KHATA LEDGER:
+- After generating a bill for a specific ledger customer, generate a small, clean, compact thermal-style mini-bill receipt (instead of a massive standard A4 invoice layout). 
+- This compact format should just list essential items, final balance added, and a small summary, making it fast and simple to view inside the Ledger timeline.
+
+3. SIMPLIFIED INVENTORY & AUTOMATIC DEDUCTION:
+- Update the "Add New Product" modal. Ensure fields for "Cost Price", "Selling Price", and "Initial Stock" are intuitive.
+- IMPORTANT: When a new bill/invoice is successfully created under the Billing Terminal, automatically deduct the corresponding item quantities from the product's available stock in the inventory.
+
+4. GST ON/OFF SMART TOGGLE:
+- Add a clear On/Off toggle section for GST features.
+- When GST is turned OFF: Hide complex fields like HSN Code from the forms, and hide CGST/SGST breakdowns from the billing summary to keep things ultra-simple.
+- When GST is turned ON: Display the HSN Code input and full tax summary layouts natively.
+
+5. MULTI-CURRENCY FORMATTING (₹ AND $):
+- Add a global setting or toggle to switch the entire application between Indian Rupees (₹) and US Dollars ($). All pricing labels, tables, and dashboards must update their currency formatting dynamically based on this switch.
+
+6. DUAL DISCOUNT FORMAT (PERCENTAGE & FLAT VALUE):
+- Update the "Discount" input area in the billing selection component. Allow users to input discounts either as a percentage (%) or as a flat cash/rupee/dollar amount, updating the total billing math correctly for both.
+
+7. DEDICATED GRAPH ANALYTICS SECTION:
+- To keep the main UI clean, avoid adding loose charts everywhere. Instead, implement a specific section or clear modal window for "Graph Analysis".
+- In this section, provide cleanly organized Bar, Line, and Pie charts focusing strictly on:
+  a) Inventory levels / stock performance.
+  b) Customer purchase history (clearly showing which customer is buying the most).
+
+Please implement these cleanly, maintaining the modern, professional design system seen across our screens.

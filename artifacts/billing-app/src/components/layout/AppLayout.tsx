@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github, Mail, Globe,
+  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useShopSettings } from "@/lib/useShopSettings";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -108,13 +109,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <DialogHeader>
             <DialogTitle className="text-slate-800">Shop Profile Settings</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-1">
             {[
               { label: "Shop Name", key: "shopName", placeholder: "e.g. Sharma General Store" },
               { label: "Owner Name", key: "ownerName", placeholder: "e.g. Rajesh Sharma" },
               { label: "Address / Location", key: "address", placeholder: "e.g. 12 Gandhi Nagar, Delhi" },
               { label: "Contact Phone", key: "phone", placeholder: "e.g. 9876543210" },
-              { label: "Shop GSTIN (15-Digit Tax ID)", key: "gstin", placeholder: "e.g. 22AAAAA0000A1Z5" },
               { label: "Thank You Message", key: "thankYouMessage", placeholder: "Thank you for shopping with us!" },
             ].map(({ label, key, placeholder }) => (
               <div className="space-y-1.5" key={key}>
@@ -127,6 +127,61 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 />
               </div>
             ))}
+
+            {/* ── GST Section ── */}
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">GST & Tax Settings</p>
+
+              {/* Global GST toggle */}
+              <div className="flex items-center justify-between bg-slate-50/60 border border-slate-200/50 rounded-xl px-4 py-3 mb-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Enable GST Features</p>
+                  <p className="text-xs text-slate-500">Show HSN codes, CGST/SGST in billing & inventory</p>
+                </div>
+                <Switch
+                  checked={form.globalGstEnabled ?? true}
+                  onCheckedChange={(v) => setForm({ ...form, globalGstEnabled: v })}
+                  data-testid="switch-global-gst"
+                />
+              </div>
+
+              {/* GSTIN — only shown when GST is enabled */}
+              {(form.globalGstEnabled ?? true) && (
+                <div className="space-y-1.5">
+                  <Label className="text-slate-700">Shop GSTIN <span className="text-slate-400 font-normal">(15-Digit Tax ID)</span></Label>
+                  <Input
+                    value={form.gstin ?? ""}
+                    onChange={(e) => setForm({ ...form, gstin: e.target.value })}
+                    placeholder="e.g. 22AAAAA0000A1Z5"
+                    data-testid="input-gstin"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* ── Currency Section ── */}
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Currency</p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: "INR", label: "₹ Indian Rupee", sub: "INR — ₹" },
+                  { value: "USD", label: "$ US Dollar", sub: "USD — $" },
+                ] as const).map((c) => (
+                  <button
+                    key={c.value}
+                    onClick={() => setForm({ ...form, currency: c.value })}
+                    className={`text-left px-4 py-3 rounded-xl border transition-all duration-150 ${
+                      (form.currency ?? "INR") === c.value
+                        ? "border-primary bg-primary/8 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <p className={`text-sm font-bold ${(form.currency ?? "INR") === c.value ? "text-primary" : "text-slate-700"}`}>{c.label}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{c.sub}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSettingsOpen(false)}>Cancel</Button>

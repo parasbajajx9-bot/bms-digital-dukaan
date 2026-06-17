@@ -1,3 +1,5 @@
+export const SUSPENSE_CUSTOMER_ID = "__suspense__";
+
 export type InventoryItem = {
   id: string;
   name: string;
@@ -50,6 +52,8 @@ export type ShopSettings = {
   termsConditions: string;
   defaultGstRate: number;
   lowStockThreshold: number;
+  currency: 'INR' | 'USD';
+  globalGstEnabled: boolean;
 };
 
 export type Bill = {
@@ -82,6 +86,8 @@ const DEFAULT_SETTINGS: ShopSettings = {
   termsConditions: "Goods once sold will not be returned.",
   defaultGstRate: 0,
   lowStockThreshold: 5,
+  currency: 'INR',
+  globalGstEnabled: true,
 };
 
 const INITIAL_INVENTORY: Omit<InventoryItem, 'id' | 'createdAt'>[] = [
@@ -108,7 +114,6 @@ function daysAgo(n: number) {
 function initializeStorage() {
   const currentVersion = localStorage.getItem('billing_version');
   if (currentVersion !== STORAGE_VERSION) {
-    // Clear old data and re-seed with new version
     ['billing_shopSettings', 'billing_inventory', 'billing_customers', 'billing_transactions', 'billing_bills'].forEach(k => localStorage.removeItem(k));
     localStorage.setItem('billing_version', STORAGE_VERSION);
   }
@@ -147,19 +152,15 @@ function initializeStorage() {
     const items0 = inventoryItems.slice(0, 3);
     const bills: Bill[] = [
       {
-        id: crypto.randomUUID(),
-        billNumber: "INV-0001",
-        customerId: customers[0]?.id,
-        customerName: customers[0]?.name,
+        id: crypto.randomUUID(), billNumber: "INV-0001",
+        customerId: customers[0]?.id, customerName: customers[0]?.name,
         items: [{ productId: items0[0]?.id, name: items0[0]?.name ?? "Rice 5kg", qty: 2, rate: 350, discount: 0, amount: 700 }],
         subtotal: 700, discount: 0, gstEnabled: false, gstRate: 0, cgst: 0, sgst: 0, igst: 0,
         total: 700, paymentMethod: 'cash', status: 'paid', shopSettings: shop, createdAt: daysAgo(5),
       },
       {
-        id: crypto.randomUUID(),
-        billNumber: "INV-0002",
-        customerId: customers[1]?.id,
-        customerName: customers[1]?.name,
+        id: crypto.randomUUID(), billNumber: "INV-0002",
+        customerId: customers[1]?.id, customerName: customers[1]?.name,
         items: [
           { productId: items0[1]?.id, name: items0[1]?.name ?? "Cooking Oil 1L", qty: 1, rate: 150, discount: 0, amount: 150 },
           { productId: items0[2]?.id, name: items0[2]?.name ?? "Sugar 1kg", qty: 2, rate: 45, discount: 0, amount: 90 },
@@ -168,19 +169,15 @@ function initializeStorage() {
         total: 240, paymentMethod: 'upi', status: 'paid', shopSettings: shop, createdAt: daysAgo(3),
       },
       {
-        id: crypto.randomUUID(),
-        billNumber: "INV-0003",
-        customerId: customers[2]?.id,
-        customerName: customers[2]?.name,
+        id: crypto.randomUUID(), billNumber: "INV-0003",
+        customerId: customers[2]?.id, customerName: customers[2]?.name,
         items: [{ name: "Toor Dal 500g", qty: 3, rate: 85, discount: 0, amount: 255 }],
         subtotal: 255, discount: 0, gstEnabled: false, gstRate: 0, cgst: 0, sgst: 0, igst: 0,
         total: 255, paymentMethod: 'credit', status: 'credit', shopSettings: shop, createdAt: daysAgo(2),
       },
       {
-        id: crypto.randomUUID(),
-        billNumber: "INV-0004",
-        customerId: customers[3]?.id,
-        customerName: customers[3]?.name,
+        id: crypto.randomUUID(), billNumber: "INV-0004",
+        customerId: customers[3]?.id, customerName: customers[3]?.name,
         items: [
           { name: "Atta 10kg", qty: 1, rate: 420, discount: 0, amount: 420 },
           { name: "Salt 1kg", qty: 2, rate: 25, discount: 0, amount: 50 },
@@ -192,7 +189,7 @@ function initializeStorage() {
     localStorage.setItem('billing_bills', JSON.stringify(bills));
 
     const transactions: Transaction[] = [
-      { id: crypto.randomUUID(), customerId: customers[0]?.id ?? '', type: 'udhaar', amount: 500, note: "Monthly grocery credit", date: daysAgo(7), billId: undefined },
+      { id: crypto.randomUUID(), customerId: customers[0]?.id ?? '', type: 'udhaar', amount: 500, note: "Monthly grocery credit", date: daysAgo(7) },
       { id: crypto.randomUUID(), customerId: customers[0]?.id ?? '', type: 'payment', amount: 300, note: "Partial payment - cash", date: daysAgo(4) },
       { id: crypto.randomUUID(), customerId: customers[1]?.id ?? '', type: 'udhaar', amount: 350, note: "Weekly groceries on credit", date: daysAgo(6) },
       { id: crypto.randomUUID(), customerId: customers[1]?.id ?? '', type: 'payment', amount: 350, note: "Full settlement via UPI", date: daysAgo(3) },
@@ -208,13 +205,27 @@ function initializeStorage() {
   }
 }
 
-// Call initially
 initializeStorage();
 
+// ─── Currency formatter ───────────────────────────────────────────────────────
+export function formatCurrency(amount: number, currency: 'INR' | 'USD' = 'INR'): string {
+  if (currency === 'USD') {
+    return `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+export function currencySymbol(currency: 'INR' | 'USD' = 'INR'): string {
+  return currency === 'USD' ? '$' : '₹';
+}
+
 export const storage = {
-  getSettings: (): ShopSettings => JSON.parse(localStorage.getItem('billing_shopSettings') || '{}'),
+  getSettings: (): ShopSettings => {
+    const stored = JSON.parse(localStorage.getItem('billing_shopSettings') || '{}');
+    return { ...DEFAULT_SETTINGS, ...stored };
+  },
   saveSettings: (settings: ShopSettings) => localStorage.setItem('billing_shopSettings', JSON.stringify(settings)),
-  
+
   getInventory: (): InventoryItem[] => JSON.parse(localStorage.getItem('billing_inventory') || '[]'),
   saveInventory: (items: InventoryItem[]) => localStorage.setItem('billing_inventory', JSON.stringify(items)),
   addInventoryItem: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => {
@@ -229,6 +240,23 @@ export const storage = {
   deleteInventoryItem: (id: string) => {
     storage.saveInventory(storage.getInventory().filter(i => i.id !== id));
   },
+  // Deduct sold quantities from inventory stock
+  deductInventoryStock: (items: BillItem[]) => {
+    const inventory = storage.getInventory();
+    let changed = false;
+    items.forEach(billItem => {
+      if (!billItem.productId) return;
+      const inv = inventory.find(i => i.id === billItem.productId);
+      if (inv) {
+        inv.stock = Math.max(0, inv.stock - billItem.qty);
+        changed = true;
+      }
+    });
+    if (changed) {
+      storage.saveInventory(inventory);
+      window.dispatchEvent(new Event('inventory-updated'));
+    }
+  },
 
   getCustomers: (): Customer[] => JSON.parse(localStorage.getItem('billing_customers') || '[]'),
   saveCustomers: (customers: Customer[]) => localStorage.setItem('billing_customers', JSON.stringify(customers)),
@@ -239,9 +267,13 @@ export const storage = {
     storage.saveCustomers(customers);
     return newCustomer;
   },
+  // Reassign transactions to suspense account instead of deleting them
   deleteCustomer: (id: string) => {
     storage.saveCustomers(storage.getCustomers().filter(c => c.id !== id));
-    storage.saveTransactions(storage.getTransactions().filter(t => t.customerId !== id));
+    const txns = storage.getTransactions().map(t =>
+      t.customerId === id ? { ...t, customerId: SUSPENSE_CUSTOMER_ID } : t
+    );
+    storage.saveTransactions(txns);
   },
 
   getTransactions: (): Transaction[] => JSON.parse(localStorage.getItem('billing_transactions') || '[]'),
