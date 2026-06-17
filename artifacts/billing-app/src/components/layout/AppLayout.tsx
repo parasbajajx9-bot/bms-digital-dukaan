@@ -230,11 +230,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   ✦ Founder
                 </span>
                 <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                  BBA · Kanpur
+                  Fintech · Retail Tech
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1.5 leading-snug">
-                Dr. Virendra Swarup Institute of Computer Studies, Kanpur
+                Building modern tools for Indian retail businesses
               </p>
             </div>
           </div>
