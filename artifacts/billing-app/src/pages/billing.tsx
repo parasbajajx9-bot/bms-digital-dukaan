@@ -219,8 +219,8 @@ export default function BillingPage() {
                 title="Toggle: percentage or flat amount"
               >
                 {discountMode === "pct"
-                  ? <><Percent size={10} /><span>% Percent</span></>
-                  : <><IndianRupee size={10} /><span>Flat Amount</span></>}
+                  ? <><Percent size={10} /><span>Percent</span></>
+                  : <><IndianRupee size={10} /><span>Flat</span></>}
               </button>
             </div>
             <div className="relative">
