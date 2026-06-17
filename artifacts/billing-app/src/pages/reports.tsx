@@ -150,17 +150,17 @@ export default function ReportsPage() {
   return (
     <div className="flex flex-col gap-4 h-full overflow-auto">
       {/* Header */}
-      <div className="flex items-center justify-between flex-shrink-0">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between flex-shrink-0">
         <div>
           <h1 className="text-xl font-extrabold text-slate-800">Reports & Bookkeeping</h1>
           <p className="text-slate-500 text-sm mt-0.5">Financial overview · {rangeLabels[range]}</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setAnalyticsOpen(true)} variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5">
+          <Button onClick={() => setAnalyticsOpen(true)} variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5 flex-1 md:flex-none">
             <Activity size={15} /> Graph Analytics
           </Button>
-          <Button onClick={exportCSV} className="gap-2 bg-primary hover:bg-primary/90 text-white">
-            <Download size={15} /> Export Tax CSV
+          <Button onClick={exportCSV} className="gap-2 bg-primary hover:bg-primary/90 text-white flex-1 md:flex-none">
+            <Download size={15} /> Export CSV
           </Button>
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-4 gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-shrink-0">
         {[
           { label: "Net Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`, color: "text-primary", Icon: TrendingUp, bg: "bg-primary/8" },
           { label: "Cash Sales", value: formatCurrency(cashSales, settings.currency), sub: `${filtered.filter(b => b.paymentMethod === "cash").length} bills`, color: "text-green-700", Icon: Wallet, bg: "bg-green-50" },

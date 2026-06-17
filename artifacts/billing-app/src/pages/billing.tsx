@@ -174,9 +174,9 @@ export default function BillingPage() {
   const paymentLabels: Record<string, string> = { cash: "Cash", upi: "UPI", card: "Card", credit: "Credit (Udhaar)" };
 
   return (
-    <div className="flex gap-5 h-full">
+    <div className="flex flex-col md:flex-row gap-5 h-full overflow-hidden">
       {/* ── Left Panel ── */}
-      <div className="w-[360px] flex-shrink-0 glass-panel p-5 flex flex-col gap-4 no-print overflow-y-auto">
+      <div className="w-full md:w-[360px] md:flex-shrink-0 glass-panel p-5 flex flex-col gap-4 no-print overflow-y-auto">
         <h2 className="text-xl font-bold text-slate-800">New Bill</h2>
 
         {/* Item picker */}
@@ -322,9 +322,9 @@ export default function BillingPage() {
       </div>
 
       {/* ── Right Panel: Invoice Preview ── */}
-      <div className="flex-1 glass-panel p-6 flex flex-col overflow-auto">
-        {/* Action bar */}
-        <div className="flex items-center justify-between mb-5 no-print">
+      <div className="flex-1 glass-panel p-4 md:p-6 flex flex-col overflow-auto min-w-0">
+        {/* Action bar — desktop only (mobile has bottom bar) */}
+        <div className="hidden md:flex items-center justify-between mb-5 no-print">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold text-slate-700">
               {gstApplicable ? "Tax Invoice Preview" : "Receipt Preview"}
@@ -342,6 +342,12 @@ export default function BillingPage() {
               <Printer size={14} /> Print / PDF
             </Button>
           </div>
+        </div>
+
+        {/* Mobile invoice label */}
+        <div className="md:hidden flex items-center gap-2 mb-4 no-print">
+          <span className="text-sm font-semibold text-slate-700">{gstApplicable ? "Tax Invoice" : "Receipt"}</span>
+          <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-mono">{previewInvoiceNo}</span>
         </div>
 
         {/* Printable Invoice */}
@@ -507,6 +513,22 @@ export default function BillingPage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Mobile action buttons — large, thumb-friendly, hidden on desktop */}
+        <div className="md:hidden mt-4 grid grid-cols-2 gap-3 flex-shrink-0 no-print">
+          <button
+            onClick={handleWhatsApp}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold bg-green-600 text-white active:bg-green-700 transition-colors shadow-sm"
+          >
+            <Share2 size={17} /> WhatsApp
+          </button>
+          <button
+            onClick={handlePrint}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold bg-slate-800 text-white active:bg-slate-900 transition-colors shadow-sm"
+          >
+            <Printer size={17} /> Print / PDF
+          </button>
         </div>
       </div>
     </div>

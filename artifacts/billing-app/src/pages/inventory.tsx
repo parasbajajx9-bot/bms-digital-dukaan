@@ -121,7 +121,7 @@ export default function InventoryPage() {
   return (
     <div className="flex flex-col gap-5 h-full">
       {/* Stats + GST Quick Toggle */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: "Total Products", value: items.length, color: "text-slate-800" },
           { label: "Low Stock", value: lowStockCount, color: "text-amber-600" },
@@ -177,7 +177,52 @@ export default function InventoryPage() {
           </Button>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        {/* Mobile card list */}
+        <div className="md:hidden flex-1 overflow-auto space-y-3 min-h-0">
+          {filtered.length === 0 && (
+            <div className="text-center py-12">
+              <Package size={32} className="mx-auto text-slate-300 mb-2" />
+              <p className="text-slate-400 text-sm">No products found</p>
+            </div>
+          )}
+          {filtered.map((item) => {
+            const isLow = item.stock > 0 && item.stock <= item.lowStockThreshold;
+            const isOut = item.stock === 0;
+            return (
+              <div key={item.id} className={`rounded-xl border px-4 py-3.5 transition-colors ${isOut ? "bg-red-50/60 border-red-200/60" : isLow ? "bg-amber-50/60 border-amber-200/60" : "bg-white/70 border-slate-200/60"}`}>
+                <div className="flex items-start justify-between mb-2.5">
+                  <div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-slate-800 text-sm">{item.name}</span>
+                      {isOut && <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">Out</span>}
+                      {isLow && !isOut && <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-medium">Low</span>}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5 font-mono">{item.sku}{item.category ? ` · ${item.category}` : ""}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => openEditModal(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors"><Edit size={14} /></button>
+                    <button onClick={() => setDeleteTarget(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"><Trash2 size={14} /></button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-slate-600">
+                    <span>Sell <strong className="text-slate-800">{sym}{item.sellingPrice}</strong></span>
+                    <span className="mx-2 text-slate-300">·</span>
+                    <span>Cost <span className="text-slate-500">{sym}{item.costPrice}</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => adjustStock(item.id, -1)} className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 flex items-center justify-center text-slate-600 transition-colors font-bold"><Minus size={12} /></button>
+                    <span className={`w-7 text-center font-bold text-sm ${isOut ? "text-red-600" : isLow ? "text-amber-600" : "text-slate-800"}`}>{item.stock}</span>
+                    <button onClick={() => adjustStock(item.id, 1)} className="w-7 h-7 rounded-lg border border-slate-200 bg-white hover:bg-green-50 hover:border-green-200 hover:text-green-600 flex items-center justify-center text-slate-600 transition-colors font-bold"><Plus size={12} /></button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block flex-1 overflow-auto">
           <table className="w-full text-sm text-left">
             <thead className="sticky top-0 bg-slate-50/90 backdrop-blur-sm z-10">
               <tr className="border-b border-slate-200">

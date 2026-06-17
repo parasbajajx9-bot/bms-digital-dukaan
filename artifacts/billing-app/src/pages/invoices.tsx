@@ -91,7 +91,7 @@ export default function InvoicesPage() {
   return (
     <div className="flex flex-col gap-5 h-full">
       {/* Stats row */}
-      <div className="grid grid-cols-4 gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-shrink-0">
         {[
           { label: "Active Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${activeBills.length} active bills`, color: "text-primary" },
           { label: "Paid Bills", value: paidCount.toString(), sub: "Settled", color: "text-emerald-600" },
@@ -109,37 +109,90 @@ export default function InvoicesPage() {
       {/* Main panel */}
       <div className="glass-panel flex-1 flex flex-col min-h-0 p-5">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-5 flex-shrink-0">
-          <div className="relative flex-1 max-w-xs">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center mb-5 flex-shrink-0">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
             <Input className="pl-9 bg-white h-9 text-sm" placeholder="Search bill # or customer…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select value={filterPM} onChange={e => setFilterPM(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option value="">All Payments</option>
-            <option value="cash">Cash</option>
-            <option value="upi">UPI</option>
-            <option value="card">Card</option>
-            <option value="credit">Credit / Udhaar</option>
-          </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option value="">All Status</option>
-            <option value="paid">Paid</option>
-            <option value="credit">Credit</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          {(search || filterPM || filterStatus) && (
-            <button onClick={() => { setSearch(""); setFilterPM(""); setFilterStatus(""); }}
-              className="h-9 px-3 rounded-lg text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition-colors flex items-center gap-1.5">
-              <X size={13} /> Clear
-            </button>
-          )}
-          <p className="ml-auto text-xs text-slate-400 font-medium">{filtered.length} invoice{filtered.length !== 1 ? "s" : ""}</p>
+          <div className="flex gap-2">
+            <select value={filterPM} onChange={e => setFilterPM(e.target.value)}
+              className="flex-1 h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">All Payments</option>
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+              <option value="credit">Credit / Udhaar</option>
+            </select>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              className="flex-1 h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="credit">Credit</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            {(search || filterPM || filterStatus) && (
+              <button onClick={() => { setSearch(""); setFilterPM(""); setFilterStatus(""); }}
+                className="h-9 px-3 rounded-lg text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+                <X size={13} /> Clear
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-slate-400 font-medium md:ml-auto">{filtered.length} invoice{filtered.length !== 1 ? "s" : ""}</p>
         </div>
 
-        {/* Table */}
-        <div className="flex-1 overflow-auto min-h-0">
+        {/* Mobile card list */}
+        <div className="md:hidden flex-1 overflow-auto min-h-0 space-y-3">
+          {filtered.length === 0 ? (
+            <div className="py-16 text-center">
+              <FileText size={36} className="mx-auto text-slate-200 mb-3" />
+              <p className="text-slate-400 font-medium">No invoices match your filters</p>
+            </div>
+          ) : filtered.map(bill => {
+            const isCancelled = bill.status === "cancelled";
+            return (
+              <div
+                key={bill.id}
+                onClick={!isCancelled ? () => setSelectedBill(bill) : undefined}
+                className={`rounded-xl border px-4 py-3.5 transition-colors ${isCancelled ? "bg-slate-50/60 border-slate-200 opacity-60" : "bg-white/80 border-slate-200/60 active:bg-slate-50 cursor-pointer"}`}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`font-bold font-mono text-xs px-2 py-1 rounded-md border ${isCancelled ? "bg-slate-100 text-slate-400 border-slate-200" : "bg-primary/8 text-primary border-primary/15"}`}>
+                      {bill.billNumber}
+                    </span>
+                    {statusBadge(bill.status)}
+                  </div>
+                  <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                    {!isCancelled && (
+                      <button onClick={() => setSelectedBill(bill)} className="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/8 transition-colors"><Eye size={14} /></button>
+                    )}
+                    {!isCancelled && (
+                      <button onClick={() => setCancelTarget(bill)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Ban size={14} /></button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-end justify-between">
+                  <div className="space-y-0.5">
+                    <p className={`font-semibold text-sm ${isCancelled ? "text-slate-400" : "text-slate-800"}`}>
+                      {bill.customerName || <span className="italic text-slate-400">Walk-in</span>}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {new Date(bill.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      {" · "}
+                      <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full border ${PM_STYLE[bill.paymentMethod]}`}>{PM_LABEL[bill.paymentMethod]}</span>
+                    </p>
+                  </div>
+                  <p className={`text-base font-extrabold ${isCancelled ? "text-slate-400 line-through" : "text-slate-800"}`}>
+                    {formatCurrency(bill.total, settings.currency)}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block flex-1 overflow-auto min-h-0">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-white/95 backdrop-blur-sm z-10">
               <tr className="border-b-2 border-slate-100">
