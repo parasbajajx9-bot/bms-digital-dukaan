@@ -1,0 +1,19 @@
+Please execute these precise layout refinements for both Desktop and Mobile views:
+
+1. DESKTOP VIEW FIX: REMOVE FLOATING ARROW
+- Locate the main top header or sidebar section containing the "PARAS ELECTRO HEAT" store icon. Find and completely remove the stray, unaligned tiny gray chevron/arrow icon element artifact next to it so the header area looks clean and seamless.
+- Implement the collapsible desktop sidebar logic (shrinking to icons-only on toggle) as planned previously.
+
+2. MOBILE VIEW: POPUP MODAL & ALIGNMENT FIXES (SHOP SETTINGS, DEVELOPER CARD, GRAPHS)
+- For all popup Modals ("Shop Profile Settings", "About Developer", and "Graph Analytics"): enforce a strict max-width (`max-w-[92vw]`) and a clean max-height (`max-h-[85vh]`) on mobile screens so they never bleed out of the viewport.
+- Center the modal bodies perfectly inside the mobile screen frame with consistent padding (`p-4`).
+- Fix the Top-Right Close ("X") Button for every single modal: ensure it is fully contained inside the absolute top-right padding bounds of the white card layout, making it highly visible, clickable, and styled properly (e.g., text-gray-500 hover:text-gray-800) without getting clipped by the top edge.
+
+3. MOBILE VIEW: CHARTS & PIE CHART RESPONSIVENESS FIX
+- Inside the Graph Analytics modal (both Inventory & Customers tabs), wrap the Bar Charts, Donut Charts, and Pie Charts inside a Tailwind `<ResponsiveContainer width="100%" height={250}>` wrapper.
+- Force the Pie/Donut charts and their side legends to stack vertically (`flex-col items-center`) on small mobile devices instead of standing side-by-side. This will ensure the charts display fully without being cut off or squished against the right margin.
+
+4. METRIC SUB-HEADS & REPORTS FILTERS (PREVIOUS FIXES):
+- Keep all dashboard metric cards tightly packed with compressed text sizes on mobile.
+- Keep the horizontal date buttons in Reports replaced with a clean drop-down select element on mobile view.
+- Ensure the GST Feature toggle is minimized and aligned cleanly at the top-right of its section header.

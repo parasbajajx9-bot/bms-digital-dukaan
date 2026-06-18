@@ -329,35 +329,38 @@ export default function ReportsPage() {
 
       {/* ── Graph Analytics Modal ── */}
       {analyticsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 md:p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[92vw] md:max-w-4xl max-h-[85vh] flex flex-col">
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <div className="flex items-start justify-between px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Activity size={16} className="text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-base font-extrabold text-slate-800 leading-none">Graph Analytics</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Inventory & customer performance data</p>
+                <div className="min-w-0">
+                  <h2 className="text-sm md:text-base font-extrabold text-slate-800 leading-none">Graph Analytics</h2>
+                  <p className="text-xs text-slate-400 mt-0.5 hidden sm:block">Inventory & customer performance data</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 flex-shrink-0">
                 <div className="flex gap-0.5 bg-slate-100 rounded-lg p-1">
                   {(["inventory", "customers"] as const).map(tab => (
                     <button key={tab} onClick={() => setAnalyticsTab(tab)}
-                      className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all capitalize ${analyticsTab === tab ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+                      className={`px-3 md:px-4 py-1.5 rounded-md text-xs font-semibold transition-all capitalize ${analyticsTab === tab ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
                       {tab}
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setAnalyticsOpen(false)} className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
-                  <X size={17} />
+                <button
+                  onClick={() => setAnalyticsOpen(false)}
+                  className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-slate-100 transition-colors border border-slate-200"
+                >
+                  <X size={16} />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto p-6 space-y-8">
+            <div className="flex-1 overflow-auto p-4 md:p-6 space-y-8">
               {analyticsTab === "inventory" && (
                 <>
                   {/* Stock bar chart — trading style */}
@@ -417,18 +420,20 @@ export default function ReportsPage() {
                       <div>
                         <h3 className="text-sm font-bold text-slate-800 mb-1">Category Stock Distribution</h3>
                         <p className="text-xs text-slate-400 mb-4">Units held per category</p>
-                        <div className="flex items-center gap-10">
-                          <ResponsiveContainer width="45%" height={200}>
-                            <PieChart>
-                              <Pie data={catData} cx="50%" cy="50%" innerRadius={58} outerRadius={90} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                {catData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
-                              </Pie>
-                              <Tooltip formatter={(val: any, name: any) => [`${val} units`, name]}
-                                contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 12, color: "#e2e8f0", fontSize: 11 }}
-                                labelStyle={{ color: "#94a3b8" }} />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="flex flex-col gap-2.5 flex-1">
+                        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-8">
+                          <div className="w-full max-w-[220px] flex-shrink-0">
+                            <ResponsiveContainer width="100%" height={200}>
+                              <PieChart>
+                                <Pie data={catData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                  {catData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                                </Pie>
+                                <Tooltip formatter={(val: any, name: any) => [`${val} units`, name]}
+                                  contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 12, color: "#e2e8f0", fontSize: 11 }}
+                                  labelStyle={{ color: "#94a3b8" }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                          <div className="flex flex-col gap-2.5 w-full">
                             {catData.map((d, i) => (
                               <div key={d.name} className="flex items-center gap-2.5">
                                 <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
@@ -491,18 +496,20 @@ export default function ReportsPage() {
                       <div>
                         <h3 className="text-sm font-bold text-slate-800 mb-1">Revenue by Payment Method</h3>
                         <p className="text-xs text-slate-400 mb-4">All-time split by how customers paid</p>
-                        <div className="flex items-center gap-10">
-                          <ResponsiveContainer width="45%" height={200}>
-                            <PieChart>
-                              <Pie data={pmData} cx="50%" cy="50%" innerRadius={58} outerRadius={90} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                                {pmData.map(d => <Cell key={d.name} fill={pmColors[d.name] ?? "#6366f1"} />)}
-                              </Pie>
-                              <Tooltip formatter={(val: any, name: any) => [formatCurrency(Number(val), settings.currency), name]}
-                                contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 12, color: "#e2e8f0", fontSize: 11 }}
-                                labelStyle={{ color: "#94a3b8" }} />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="flex flex-col gap-2.5 flex-1">
+                        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-8">
+                          <div className="w-full max-w-[220px] flex-shrink-0">
+                            <ResponsiveContainer width="100%" height={200}>
+                              <PieChart>
+                                <Pie data={pmData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value" strokeWidth={0}>
+                                  {pmData.map(d => <Cell key={d.name} fill={pmColors[d.name] ?? "#6366f1"} />)}
+                                </Pie>
+                                <Tooltip formatter={(val: any, name: any) => [formatCurrency(Number(val), settings.currency), name]}
+                                  contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 12, color: "#e2e8f0", fontSize: 11 }}
+                                  labelStyle={{ color: "#94a3b8" }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                          <div className="flex flex-col gap-2.5 w-full">
                             {pmData.map(d => (
                               <div key={d.name} className="flex items-center gap-2.5">
                                 <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: pmColors[d.name] ?? "#6366f1" }} />

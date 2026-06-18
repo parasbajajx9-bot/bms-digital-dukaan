@@ -58,28 +58,29 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         ${sidebarCollapsed ? "md:w-[58px]" : "md:w-60"}
       `}>
 
-        {/* Desktop collapse toggle — top-right corner, desktop only */}
-        <button
-          onClick={() => setSidebarCollapsed(c => !c)}
-          className="hidden md:flex absolute top-3 right-2.5 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors z-10"
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-
-        {/* Shop identity — hidden in collapsed desktop mode */}
+        {/* ── Expanded header: shop identity + inline collapse toggle ── */}
         <div className={`px-4 mb-6 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:hidden" : ""}`}>
           <div className="flex items-center gap-2">
             <Store size={20} className="text-primary flex-shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-base font-bold text-slate-800 leading-tight truncate max-w-[140px]">
+              <h1 className="text-base font-bold text-slate-800 leading-tight truncate max-w-[120px]">
                 {settings.shopName}
               </h1>
-              <p className="text-xs text-slate-500 truncate max-w-[140px]">{settings.ownerName}</p>
+              <p className="text-xs text-slate-500 truncate max-w-[120px]">{settings.ownerName}</p>
             </div>
-            {/* Close button — mobile only */}
+
+            {/* Desktop collapse toggle — sits cleanly in the header row */}
             <button
-              className="ml-auto md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              onClick={() => setSidebarCollapsed(true)}
+              className="hidden md:flex ml-auto flex-shrink-0 p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+              title="Collapse sidebar"
+            >
+              <ChevronLeft size={15} />
+            </button>
+
+            {/* Mobile close button */}
+            <button
+              className="md:hidden ml-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               onClick={() => setSidebarOpen(false)}
             >
               <X size={16} />
@@ -87,12 +88,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Collapsed state: centered Store icon — desktop only */}
-        <div className={`hidden transition-all duration-300 ${sidebarCollapsed ? "md:flex justify-center mb-5 mt-1" : ""}`}>
+        {/* ── Collapsed state header: store icon + expand button ── */}
+        <div className={`hidden transition-all duration-300 ${sidebarCollapsed ? "md:flex flex-col items-center gap-2 mb-5 pt-1" : ""}`}>
           <Store size={20} className="text-primary" />
+          <button
+            onClick={() => setSidebarCollapsed(false)}
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            title="Expand sidebar"
+          >
+            <ChevronRight size={15} />
+          </button>
         </div>
 
-        {/* Nav */}
+        {/* ── Nav ── */}
         <nav className="flex-1 px-2 space-y-0.5 overflow-hidden">
           {navItems.map((item) => {
             const isActive = location === item.path || (location === "/" && item.path === "/billing");
@@ -120,7 +128,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Bottom actions */}
+        {/* ── Bottom actions ── */}
         <div className="px-2 py-3 border-t border-slate-200/60 space-y-0.5">
           <button
             onClick={() => { handleOpenSettings(); setSidebarOpen(false); }}
@@ -167,7 +175,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── Shop Settings Modal ── */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="max-w-[92vw] sm:max-w-md bg-white">
           <DialogHeader>
             <DialogTitle className="text-slate-800">Shop Profile Settings</DialogTitle>
           </DialogHeader>
@@ -250,7 +258,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── About Developer Modal ── */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="sm:max-w-md bg-white p-0 overflow-hidden">
+        <DialogContent className="max-w-[92vw] sm:max-w-md bg-white p-0 overflow-hidden max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="sr-only">About Developer</DialogTitle>
           </DialogHeader>
@@ -260,7 +268,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               style={{ backgroundImage: "radial-gradient(circle at 30% 50%, white 1px, transparent 1px), radial-gradient(circle at 70% 80%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
           </div>
 
-          <div className="flex flex-col items-center -mt-12 px-7 pb-0">
+          <div className="flex flex-col items-center -mt-12 px-5 pb-0">
             <div className="relative">
               <img
                 src="/my-profile.jpg"
@@ -296,7 +304,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="px-7 mt-4">
+          <div className="px-5 mt-4">
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
               <p className="text-sm text-slate-600 leading-relaxed">
                 Driven by the desire to help local small-business owners transition away from chaotic
@@ -310,7 +318,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="px-7 mt-4">
+          <div className="px-5 mt-4">
             <div className="flex gap-2">
               <a
                 href="https://www.linkedin.com/in/paras-bajaj-752174314"
@@ -335,7 +343,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="px-7 py-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-5 py-4 mt-4 border-t border-slate-100 flex items-center justify-between">
             <p className="text-xs text-slate-400">Digital Dukaan · Built with ❤️ in India</p>
             <Button size="sm" variant="outline" onClick={() => setAboutOpen(false)}>Close</Button>
           </div>
