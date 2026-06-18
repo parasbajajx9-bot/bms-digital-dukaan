@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github, FileText, Menu, X,
+  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github, FileText,
+  Menu, X, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [form, setForm] = useState({ ...settings });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const navItems = [
     { path: "/billing", label: "Billing Terminal", icon: Calculator },
@@ -39,7 +41,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-full overflow-hidden text-foreground relative">
 
-      {/* Mobile overlay — closes sidebar when tapping outside */}
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
@@ -47,15 +49,26 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <div className={`
         fixed md:relative inset-y-0 left-0 z-50 md:z-10
-        w-60 flex-shrink-0 sidebar-glass h-full flex flex-col pt-6
-        transition-transform duration-300 ease-in-out
+        w-60 flex-shrink-0 sidebar-glass h-full flex flex-col pt-5
+        transition-all duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        ${sidebarCollapsed ? "md:w-[58px]" : "md:w-60"}
       `}>
-        {/* Shop identity */}
-        <div className="px-6 mb-8">
+
+        {/* Desktop collapse toggle — top-right corner, desktop only */}
+        <button
+          onClick={() => setSidebarCollapsed(c => !c)}
+          className="hidden md:flex absolute top-3 right-2.5 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors z-10"
+          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
+
+        {/* Shop identity — hidden in collapsed desktop mode */}
+        <div className={`px-4 mb-6 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:hidden" : ""}`}>
           <div className="flex items-center gap-2">
             <Store size={20} className="text-primary flex-shrink-0" />
             <div className="min-w-0">
@@ -74,8 +87,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
+        {/* Collapsed state: centered Store icon — desktop only */}
+        <div className={`hidden transition-all duration-300 ${sidebarCollapsed ? "md:flex justify-center mb-5 mt-1" : ""}`}>
+          <Store size={20} className="text-primary" />
+        </div>
+
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-2 space-y-0.5 overflow-hidden">
           {navItems.map((item) => {
             const isActive = location === item.path || (location === "/" && item.path === "/billing");
             const Icon = item.icon;
@@ -83,15 +101,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Link key={item.path} href={item.path}>
                 <div
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150 ${
-                    isActive
+                  title={sidebarCollapsed ? item.label : undefined}
+                  className={`flex items-center gap-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150
+                    ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}
+                    ${isActive
                       ? "bg-primary/10 text-primary font-semibold border border-primary/20"
                       : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
-                  }`}
+                    }`}
                   data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <Icon size={18} />
-                  <span className="text-sm">{item.label}</span>
+                  <Icon size={18} className="flex-shrink-0" />
+                  <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
+                    {item.label}
+                  </span>
                 </div>
               </Link>
             );
@@ -99,26 +121,35 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Bottom actions */}
-        <div className="px-3 py-4 border-t border-slate-200/60 space-y-1">
+        <div className="px-2 py-3 border-t border-slate-200/60 space-y-0.5">
           <button
             onClick={() => { handleOpenSettings(); setSidebarOpen(false); }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150"
+            title={sidebarCollapsed ? "Shop Settings" : undefined}
+            className={`flex items-center gap-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150
+              ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}`}
             data-testid="btn-settings-bottom"
           >
-            <Settings size={18} />
-            <span className="text-sm">Shop Settings</span>
+            <Settings size={18} className="flex-shrink-0" />
+            <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
+              Shop Settings
+            </span>
           </button>
           <button
             onClick={() => { setAboutOpen(true); setSidebarOpen(false); }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150"
+            title={sidebarCollapsed ? "About Developer" : undefined}
+            className={`flex items-center gap-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150
+              ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}`}
             data-testid="btn-about-developer"
           >
-            <Info size={18} />
-            <span className="text-sm">About Developer</span>
+            <Info size={18} className="flex-shrink-0" />
+            <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
+              About Developer
+            </span>
           </button>
         </div>
       </div>
 
+      {/* ── Main content ── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         {/* Mobile top bar — hidden on desktop */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 sidebar-glass border-b border-slate-200/60 flex-shrink-0">
@@ -134,7 +165,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
 
-      {/* Shop Settings Modal */}
+      {/* ── Shop Settings Modal ── */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
@@ -159,11 +190,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             ))}
 
-            {/* ── GST Section ── */}
+            {/* GST Section */}
             <div className="pt-2 border-t border-slate-100">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">GST & Tax Settings</p>
-
-              {/* Global GST toggle */}
               <div className="flex items-center justify-between bg-slate-50/60 border border-slate-200/50 rounded-xl px-4 py-3 mb-3">
                 <div>
                   <p className="text-sm font-semibold text-slate-700">Enable GST Features</p>
@@ -175,8 +204,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   data-testid="switch-global-gst"
                 />
               </div>
-
-              {/* GSTIN — only shown when GST is enabled */}
               {(form.globalGstEnabled ?? true) && (
                 <div className="space-y-1.5">
                   <Label className="text-slate-700">Shop GSTIN <span className="text-slate-400 font-normal">(15-Digit Tax ID)</span></Label>
@@ -190,7 +217,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            {/* ── Currency Section ── */}
+            {/* Currency Section */}
             <div className="pt-2 border-t border-slate-100">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Currency</p>
               <div className="grid grid-cols-2 gap-2">
@@ -221,20 +248,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </DialogContent>
       </Dialog>
 
-      {/* About Developer Modal */}
+      {/* ── About Developer Modal ── */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent className="sm:max-w-md bg-white p-0 overflow-hidden">
           <DialogHeader>
             <DialogTitle className="sr-only">About Developer</DialogTitle>
           </DialogHeader>
 
-          {/* Gradient hero banner */}
           <div className="h-24 bg-gradient-to-br from-primary via-cyan-500 to-emerald-400 relative flex-shrink-0">
             <div className="absolute inset-0 opacity-20"
               style={{ backgroundImage: "radial-gradient(circle at 30% 50%, white 1px, transparent 1px), radial-gradient(circle at 70% 80%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
           </div>
 
-          {/* Profile picture — overlaps banner */}
           <div className="flex flex-col items-center -mt-12 px-7 pb-0">
             <div className="relative">
               <img
@@ -248,7 +273,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   if (fallback) fallback.style.display = "flex";
                 }}
               />
-              {/* Fallback initials avatar — hidden by default, shown if image 404s */}
               <div
                 className="w-24 h-24 rounded-full border-4 border-white shadow-xl bg-gradient-to-br from-primary to-cyan-400 items-center justify-center text-white text-3xl font-extrabold select-none"
                 style={{ display: "none" }}
@@ -256,8 +280,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 PB
               </div>
             </div>
-
-            {/* Name + badges */}
             <div className="mt-3 text-center">
               <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Paras Bajaj</h2>
               <div className="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
@@ -274,7 +296,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Bio */}
           <div className="px-7 mt-4">
             <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
               <p className="text-sm text-slate-600 leading-relaxed">
@@ -289,7 +310,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Social links */}
           <div className="px-7 mt-4">
             <div className="flex gap-2">
               <a
@@ -315,7 +335,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="px-7 py-4 mt-4 border-t border-slate-100 flex items-center justify-between">
             <p className="text-xs text-slate-400">Digital Dukaan · Built with ❤️ in India</p>
             <Button size="sm" variant="outline" onClick={() => setAboutOpen(false)}>Close</Button>
