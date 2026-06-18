@@ -91,17 +91,17 @@ export default function InvoicesPage() {
   return (
     <div className="flex flex-col gap-5 h-full">
       {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
         {[
           { label: "Active Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${activeBills.length} active bills`, color: "text-primary" },
           { label: "Paid Bills", value: paidCount.toString(), sub: "Settled", color: "text-emerald-600" },
           { label: "Credit Pending", value: formatCurrency(pendingCredit, settings.currency), sub: `${activeBills.filter(b => b.status === "credit").length} bills`, color: "text-red-600" },
           { label: "Cancelled", value: cancelledCount.toString(), sub: "Stock restored", color: "text-slate-500" },
         ].map(s => (
-          <div key={s.label} className="glass-panel p-5">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{s.label}</p>
-            <p className={`text-2xl font-extrabold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{s.sub}</p>
+          <div key={s.label} className="glass-panel p-3 md:p-5">
+            <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5 md:mb-1">{s.label}</p>
+            <p className={`text-base md:text-2xl font-extrabold leading-tight ${s.color}`}>{s.value}</p>
+            <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{s.sub}</p>
           </div>
         ))}
       </div>

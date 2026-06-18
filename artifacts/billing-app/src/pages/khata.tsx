@@ -130,32 +130,32 @@ export default function KhataPage() {
     <div className="flex flex-col gap-4 h-full">
 
       {/* ── KPI Summary Bar ── */}
-      <div className="grid grid-cols-2 gap-4 flex-shrink-0">
-        <div className="glass-panel px-6 py-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-            <TrendingDown size={18} className="text-red-600" />
+      <div className="grid grid-cols-2 gap-3 md:gap-4 flex-shrink-0">
+        <div className="glass-panel px-3 py-3 md:px-6 md:py-4 flex items-center gap-2 md:gap-4">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+            <TrendingDown size={15} className="text-red-600" />
           </div>
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Total Credit Outstanding</p>
-            <p className="text-2xl font-extrabold text-red-600 leading-none">{formatCurrency(totalOutstanding, settings.currency)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{customersWithBalance} customer{customersWithBalance !== 1 ? "s" : ""} with pending balance</p>
+          <div className="min-w-0">
+            <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5 truncate">Total Credit Outstanding</p>
+            <p className="text-base md:text-2xl font-extrabold text-red-600 leading-none">{formatCurrency(totalOutstanding, settings.currency)}</p>
+            <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{customersWithBalance} pending</p>
           </div>
         </div>
-        <div className="glass-panel px-6 py-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-            <TrendingUp size={18} className="text-emerald-600" />
+        <div className="glass-panel px-3 py-3 md:px-6 md:py-4 flex items-center gap-2 md:gap-4">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+            <TrendingUp size={15} className="text-emerald-600" />
           </div>
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Collected This Month</p>
-            <p className="text-2xl font-extrabold text-emerald-600 leading-none">{formatCurrency(collectedThisMonth, settings.currency)}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{new Date().toLocaleString("en-IN", { month: "long", year: "numeric" })}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5 truncate">Collected This Month</p>
+            <p className="text-base md:text-2xl font-extrabold text-emerald-600 leading-none">{formatCurrency(collectedThisMonth, settings.currency)}</p>
+            <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{new Date().toLocaleString("en-IN", { month: "short", year: "numeric" })}</p>
           </div>
         </div>
       </div>
 
-    <div className="flex gap-5 flex-1 min-h-0">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-5 flex-1 overflow-auto md:min-h-0">
       {/* ── Left: Customer List ── */}
-      <div className="w-72 flex-shrink-0 glass-panel p-4 flex flex-col gap-3">
+      <div className="w-full md:w-72 md:flex-shrink-0 glass-panel p-4 flex flex-col gap-3 md:max-h-none max-h-64">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />

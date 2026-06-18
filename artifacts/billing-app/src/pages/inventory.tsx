@@ -121,26 +121,26 @@ export default function InventoryPage() {
   return (
     <div className="flex flex-col gap-5 h-full">
       {/* Stats + GST Quick Toggle */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
         {[
           { label: "Total Products", value: items.length, color: "text-slate-800" },
           { label: "Low Stock", value: lowStockCount, color: "text-amber-600" },
           { label: "Out of Stock", value: outOfStockCount, color: "text-red-600" },
           { label: "Inventory Value", value: formatCurrency(totalValue, settings.currency), color: "text-primary font-bold" },
         ].map((stat) => (
-          <div key={stat.label} className="glass-panel p-5">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{stat.label}</p>
-            <p className={`text-2xl font-extrabold ${stat.color}`}>{stat.value}</p>
+          <div key={stat.label} className="glass-panel p-3 md:p-5">
+            <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5 md:mb-1">{stat.label}</p>
+            <p className={`text-lg md:text-2xl font-extrabold leading-tight ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
 
-        {/* GST Quick Toggle — 5th card */}
+        {/* GST Quick Toggle — 5th card, desktop only */}
         <div
           role="button"
           tabIndex={0}
           onClick={toggleGst}
           onKeyDown={e => e.key === "Enter" && toggleGst()}
-          className={`glass-panel p-5 text-left transition-all duration-200 hover:shadow-md cursor-pointer select-none ${settings.globalGstEnabled ? "border-primary/30 bg-primary/5" : "border-slate-200/60"}`}
+          className={`hidden md:block glass-panel p-5 text-left transition-all duration-200 hover:shadow-md cursor-pointer select-none ${settings.globalGstEnabled ? "border-primary/30 bg-primary/5" : "border-slate-200/60"}`}
         >
           <div className="flex items-start justify-between mb-3">
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${settings.globalGstEnabled ? "bg-primary/15" : "bg-slate-100"}`}>
@@ -159,21 +159,33 @@ export default function InventoryPage() {
       </div>
 
       {/* Main table */}
-      <div className="glass-panel flex-1 p-5 flex flex-col min-h-0">
-        <div className="flex items-center gap-3 mb-5">
+      <div className="glass-panel flex-1 p-4 md:p-5 flex flex-col min-h-0">
+        {/* Mobile GST toggle strip */}
+        <div className="md:hidden flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <Zap size={13} className={settings.globalGstEnabled ? "text-primary" : "text-slate-400"} />
+            <span className="text-xs font-semibold text-slate-600">GST Features</span>
+            <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${settings.globalGstEnabled ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>
+              {settings.globalGstEnabled ? "On" : "Off"}
+            </span>
+          </div>
+          <Switch checked={settings.globalGstEnabled} onCheckedChange={toggleGst} />
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-5">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
             <Input placeholder="Search product name or SKU..." className="pl-9 bg-white" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           {categories.length > 0 && (
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
-              className="h-9 px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-              <option value="">All Categories</option>
+              className="h-9 px-2 md:px-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">All</option>
               {categories.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           )}
-          <Button className="gap-2 bg-primary hover:bg-primary/90 text-white" onClick={openAddModal}>
-            <Plus size={15} /> Add Product
+          <Button className="gap-1.5 bg-primary hover:bg-primary/90 text-white text-sm px-3 md:px-4" onClick={openAddModal}>
+            <Plus size={15} /> <span className="hidden md:inline">Add Product</span><span className="md:hidden">Add</span>
           </Button>
         </div>
 

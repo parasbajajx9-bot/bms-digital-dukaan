@@ -165,8 +165,8 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Range selector */}
-      <div className="flex gap-2 flex-wrap flex-shrink-0">
+      {/* Range selector — desktop: pill buttons | mobile: compact dropdown */}
+      <div className="hidden md:flex gap-2 flex-wrap flex-shrink-0">
         {(Object.keys(rangeLabels) as Range[]).map(r => (
           <button key={r} onClick={() => setRange(r)}
             className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-150 ${range === r ? "bg-primary text-white border-primary shadow-sm" : "bg-white/80 text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary"}`}>
@@ -174,20 +174,32 @@ export default function ReportsPage() {
           </button>
         ))}
       </div>
+      <div className="md:hidden flex-shrink-0">
+        <select
+          value={range}
+          onChange={e => setRange(e.target.value as Range)}
+          className="w-full h-9 px-3 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
+        >
+          {(Object.keys(rangeLabels) as Range[]).map(r => (
+            <option key={r} value={r}>{rangeLabels[r]}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
         {[
           { label: "Net Revenue", value: formatCurrency(totalRevenue, settings.currency), sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`, color: "text-primary", Icon: TrendingUp, bg: "bg-primary/8" },
           { label: "Cash Sales", value: formatCurrency(cashSales, settings.currency), sub: `${filtered.filter(b => b.paymentMethod === "cash").length} bills`, color: "text-green-700", Icon: Wallet, bg: "bg-green-50" },
           { label: "UPI / Card", value: formatCurrency(upiSales, settings.currency), sub: `${filtered.filter(b => ["upi", "card"].includes(b.paymentMethod)).length} bills`, color: "text-blue-700", Icon: CreditCard, bg: "bg-blue-50" },
           { label: "Credit (Udhaar)", value: formatCurrency(creditGiven, settings.currency), sub: `${filtered.filter(b => b.paymentMethod === "credit").length} bills`, color: "text-red-600", Icon: AlertCircle, bg: "bg-red-50" },
         ].map(card => (
-          <div key={card.label} className="glass-panel p-5">
-            <div className={`inline-flex p-2 rounded-lg ${card.bg} mb-3`}><card.Icon size={18} className={card.color} /></div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{card.label}</p>
-            <p className={`text-2xl font-extrabold mt-1 ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{card.sub}</p>
+          <div key={card.label} className="glass-panel p-3 md:p-5">
+            <div className={`inline-flex p-1.5 md:p-2 rounded-lg ${card.bg} mb-2 md:mb-3`}><card.Icon size={15} className={card.color} /></div>
+            <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide">{card.label}</p>
+            <p className={`text-base md:text-2xl font-extrabold mt-0.5 md:mt-1 leading-tight ${card.color}`}>{card.value}</p>
+            <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{card.sub}</p>
           </div>
         ))}
       </div>
@@ -255,10 +267,10 @@ export default function ReportsPage() {
       </div>
 
       {/* Bills table + GST Summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 glass-panel p-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 glass-panel p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Sales History</h3>
-          <div className="overflow-auto max-h-64">
+          <div className="overflow-auto md:max-h-64">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-white/90 backdrop-blur-sm">
                 <tr className="border-b border-slate-200">
