@@ -3,21 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Billing &amp; Khata App</title>
-    <meta name="description" content="Billing &amp; Khata App — built on Replit. Update this description to reflect the app." />
+    <title>BMS - Business Management System</title>
+    <meta name="description" content="BMS – All-in-one billing, inventory, GST, and Khata ledger for Indian shop owners." />
     <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="Billing &amp; Khata App" />
-    <meta property="og:description" content="Billing &amp; Khata App — built on Replit. Update this description to reflect the app." />
+    <meta property="og:title" content="BMS - Business Management System" />
+    <meta property="og:description" content="BMS – All-in-one billing, inventory, GST, and Khata ledger for Indian shop owners." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Billing &amp; Khata App" />
-    <meta name="twitter:description" content="Billing &amp; Khata App — built on Replit. Update this description to reflect the app." />
+    <meta name="twitter:title" content="BMS - Business Management System" />
+    <meta name="twitter:description" content="BMS – All-in-one billing, inventory & Khata ledger for Indian shop owners." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
+  <link rel="manifest" href="/manifest.json" />
   <body>
+    <div id="pwa-install-popup" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: #ffffff; color: #1e293b; padding: 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 9999; max-width: 400px; margin: 0 auto; border: 1px solid #e2e8f0; font-family: sans-serif;">
+      <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 500; line-height: 1.4;">Install BMS – Business Management System for a faster, full-screen experience!</p>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button id="pwa-never-btn" style="background: transparent; color: #64748b; border: none; padding: 6px 12px; font-size: 13px; cursor: pointer;">Never ask again</button>
+        <button id="pwa-close-btn" style="background: #f1f5f9; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;">Later</button>
+        <button id="pwa-install-btn" style="background: #3b82f6; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">Install</button>
+      </div>
+    </div>
+    <script>
+      let deferredPrompt;
+      const popup = document.getElementById('pwa-install-popup');
+      const installBtn = document.getElementById('pwa-install-btn');
+      const closeBtn = document.getElementById('pwa-close-btn');
+      const neverBtn = document.getElementById('pwa-never-btn');
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
+      }
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); deferredPrompt = e;
+        if (localStorage.getItem('pwa-never-ask') === 'true') return;
+        popup.style.display = 'block';
+      });
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') popup.style.display = 'none';
+          deferredPrompt = null;
+        }
+      });
+      closeBtn.addEventListener('click', () => { popup.style.display = 'none'; });
+      neverBtn.addEventListener('click', () => { localStorage.setItem('pwa-never-ask', 'true'); popup.style.display = 'none'; });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

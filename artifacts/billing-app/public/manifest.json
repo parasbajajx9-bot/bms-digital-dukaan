@@ -1,0 +1,15 @@
+{
+  "short_name": "BMS",
+  "name": "BMS - Business Management System",
+  "icons": [
+    {
+      "src": "./logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "display": "standalone"
+}

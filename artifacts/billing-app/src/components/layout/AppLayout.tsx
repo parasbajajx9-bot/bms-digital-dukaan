@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, Github, FileText,
-  Menu, X, ChevronLeft, ChevronRight,
+  Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, FileText,
+  Menu, X, ChevronLeft, ChevronRight, HelpCircle, Bot,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useShopSettings } from "@/lib/useShopSettings";
+import { AiAssistant } from "@/components/AiAssistant";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -26,6 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { path: "/invoices", label: "Invoices", icon: FileText },
     { path: "/reports", label: "Reports", icon: BarChart3 },
     { path: "/khata", label: "Khata Ledger", icon: BookOpen },
+    { path: "/help", label: "Help & Support", icon: HelpCircle },
   ];
 
   const handleOpenSettings = () => {
@@ -43,10 +45,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ── Sidebar ── */}
@@ -58,18 +57,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         ${sidebarCollapsed ? "md:w-[58px]" : "md:w-60"}
       `}>
 
-        {/* ── Expanded header: shop identity + inline collapse toggle ── */}
+        {/* ── Expanded header ── */}
         <div className={`px-4 mb-6 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:hidden" : ""}`}>
           <div className="flex items-center gap-2">
             <Store size={20} className="text-primary flex-shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-base font-bold text-slate-800 leading-tight truncate max-w-[120px]">
-                {settings.shopName}
+              <h1 className="text-sm font-bold text-slate-800 leading-tight truncate max-w-[140px]" title="BMS - Business Management System">
+                BMS
               </h1>
-              <p className="text-xs text-slate-500 truncate max-w-[120px]">{settings.ownerName}</p>
+              <p className="text-[10px] text-slate-500 truncate max-w-[140px]">Business Management System</p>
             </div>
-
-            {/* Desktop collapse toggle — sits cleanly in the header row */}
             <button
               onClick={() => setSidebarCollapsed(true)}
               className="hidden md:flex ml-auto flex-shrink-0 p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
@@ -77,8 +74,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <ChevronLeft size={15} />
             </button>
-
-            {/* Mobile close button */}
             <button
               className="md:hidden ml-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               onClick={() => setSidebarOpen(false)}
@@ -88,7 +83,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* ── Collapsed state header: store icon + expand button ── */}
+        {/* ── Collapsed state header ── */}
         <div className={`hidden transition-all duration-300 ${sidebarCollapsed ? "md:flex flex-col items-center gap-2 mb-5 pt-1" : ""}`}>
           <Store size={20} className="text-primary" />
           <button
@@ -116,7 +111,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       ? "bg-primary/10 text-primary font-semibold border border-primary/20"
                       : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                     }`}
-                  data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <Icon size={18} className="flex-shrink-0" />
                   <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
@@ -135,7 +129,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             title={sidebarCollapsed ? "Shop Settings" : undefined}
             className={`flex items-center gap-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150
               ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}`}
-            data-testid="btn-settings-bottom"
           >
             <Settings size={18} className="flex-shrink-0" />
             <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
@@ -147,7 +140,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             title={sidebarCollapsed ? "About Developer" : undefined}
             className={`flex items-center gap-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150
               ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}`}
-            data-testid="btn-about-developer"
           >
             <Info size={18} className="flex-shrink-0" />
             <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
@@ -159,7 +151,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── Main content ── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
-        {/* Mobile top bar — hidden on desktop */}
+        {/* Mobile top bar */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 sidebar-glass border-b border-slate-200/60 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(o => !o)}
@@ -168,7 +160,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <Menu size={20} />
           </button>
           <Store size={17} className="text-primary flex-shrink-0" />
-          <p className="text-sm font-bold text-slate-800 truncate">{settings.shopName}</p>
+          <p className="text-sm font-bold text-slate-800 truncate flex-1">BMS – Business Management System</p>
         </div>
         <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
@@ -193,7 +185,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   value={(form as any)[key] ?? ""}
                   onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   placeholder={placeholder}
-                  data-testid={`input-${key}`}
                 />
               </div>
             ))}
@@ -209,7 +200,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <Switch
                   checked={form.globalGstEnabled ?? true}
                   onCheckedChange={(v) => setForm({ ...form, globalGstEnabled: v })}
-                  data-testid="switch-global-gst"
                 />
               </div>
               {(form.globalGstEnabled ?? true) && (
@@ -219,8 +209,54 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     value={form.gstin ?? ""}
                     onChange={(e) => setForm({ ...form, gstin: e.target.value })}
                     placeholder="e.g. 22AAAAA0000A1Z5"
-                    data-testid="input-gstin"
                   />
+                </div>
+              )}
+            </div>
+
+            {/* Financial / BEP Section */}
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Financial Settings</p>
+              <div className="space-y-1.5">
+                <Label className="text-slate-700">Monthly Fixed Overhead (₹)
+                  <span className="text-slate-400 font-normal ml-1">— for Break-Even Calculation</span>
+                </Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={form.monthlyOverhead ?? ""}
+                  onChange={(e) => setForm({ ...form, monthlyOverhead: Number(e.target.value) || 0 })}
+                  placeholder="e.g. 15000 (Rent + Salaries + Bills)"
+                />
+                <p className="text-xs text-slate-400">Enter your monthly fixed costs (rent, electricity, salaries). This is used to calculate your Break-Even Point in Reports.</p>
+              </div>
+            </div>
+
+            {/* AI Assistant Section */}
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">AI Assistant</p>
+              <div className="flex items-center justify-between bg-slate-50/60 border border-slate-200/50 rounded-xl px-4 py-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Bot size={16} className="text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-700">Enable AI Assistant</p>
+                    <p className="text-xs text-slate-500">Floating chat button on all pages</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={form.aiEnabled ?? true}
+                  onCheckedChange={(v) => setForm({ ...form, aiEnabled: v })}
+                />
+              </div>
+              {(form.aiEnabled ?? true) && (
+                <div className="space-y-1.5">
+                  <Label className="text-slate-700">AI Assistant Name</Label>
+                  <Input
+                    value={form.aiName ?? "Paras"}
+                    onChange={(e) => setForm({ ...form, aiName: e.target.value })}
+                    placeholder="e.g. Paras"
+                  />
+                  <p className="text-xs text-slate-400">Your AI assistant will greet you and sign messages with this name.</p>
                 </div>
               )}
             </div>
@@ -251,7 +287,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSettingsOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} data-testid="btn-save-settings">Save Changes</Button>
+            <Button onClick={handleSave}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -273,20 +309,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <img
                 src="/my-profile.jpg"
                 alt="Paras Bajaj"
-                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl"
-                onError={(e) => {
-                  const el = e.currentTarget as HTMLImageElement;
-                  el.style.display = "none";
-                  const fallback = el.nextElementSibling as HTMLElement | null;
-                  if (fallback) fallback.style.display = "flex";
-                }}
+                className="w-24 h-24 rounded-full object-cover object-center border-4 border-white shadow-xl"
               />
-              <div
-                className="w-24 h-24 rounded-full border-4 border-white shadow-xl bg-gradient-to-br from-primary to-cyan-400 items-center justify-center text-white text-3xl font-extrabold select-none"
-                style={{ display: "none" }}
-              >
-                PB
-              </div>
             </div>
             <div className="mt-3 text-center">
               <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Paras Bajaj</h2>
@@ -304,51 +328,40 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="px-5 mt-4">
-            <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Driven by the desire to help local small-business owners transition away from chaotic
-                paper registers and manual credit (Udhaar) tracking, I designed and co-engineered this
-                smart desktop terminal. This lightweight, premium platform gives everyday retail vendors
-                simple, non-technical tools to manage{" "}
-                <strong className="text-slate-700">GST-compliant billing</strong>,{" "}
-                <strong className="text-slate-700">live inventory control</strong>, and{" "}
-                <strong className="text-slate-700">digital ledger tracking</strong> effortlessly.
-              </p>
-            </div>
+          <div className="px-5 mt-4 bg-slate-50/80 border border-slate-200/60 rounded-xl mx-5 p-4">
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Driven by the vision to digitalize traditional Indian retail, I designed and engineered
+              <strong className="text-slate-800"> BMS – Business Management System</strong>. Moving beyond basic billing,
+              this comprehensive system empowers local vendors with advanced tools for
+              <strong className="text-slate-700"> live inventory management</strong>,
+              <strong className="text-slate-700"> digital credit (Khata) ledger analysis</strong>, and
+              <strong className="text-slate-700"> automated data reports</strong>—all inside a seamless, premium terminal.
+            </p>
           </div>
 
           <div className="px-5 mt-4">
-            <div className="flex gap-2">
-              <a
-                href="https://www.linkedin.com/in/paras-bajaj-752174314"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 flex-1 justify-center px-4 py-2.5 rounded-xl border border-[#0A66C2]/30 bg-[#0A66C2]/5 text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 text-sm font-semibold transition-all duration-150"
-              >
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                </svg>
-                LinkedIn
-              </a>
-              <a
-                href="https://github.com/parasbajajx9-bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 flex-1 justify-center px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-400 text-sm font-semibold transition-all duration-150"
-              >
-                <Github size={16} />
-                GitHub
-              </a>
-            </div>
+            <a
+              href="https://www.linkedin.com/in/paras-bajaj-752174314"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 w-full justify-center px-4 py-2.5 rounded-xl border border-[#0A66C2]/30 bg-[#0A66C2]/5 text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 text-sm font-semibold transition-all duration-150"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              LinkedIn — Connect with Paras Bajaj
+            </a>
           </div>
 
           <div className="px-5 py-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs text-slate-400">Digital Dukaan · Built with ❤️ in India</p>
+            <p className="text-xs text-slate-400">BMS – Business Management System · Built with ❤️ in India</p>
             <Button size="sm" variant="outline" onClick={() => setAboutOpen(false)}>Close</Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ── AI Assistant (global overlay) ── */}
+      <AiAssistant />
     </div>
   );
 }

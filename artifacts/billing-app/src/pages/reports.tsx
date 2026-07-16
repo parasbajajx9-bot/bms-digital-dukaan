@@ -110,6 +110,18 @@ export default function ReportsPage() {
   const chartData = buildChartData(filtered);
   const avgRevenue = chartData.length > 0 ? chartData.reduce((s, d) => s + d.total, 0) / chartData.length : 0;
 
+  // ── Financial Health calculations ──
+  const inventoryMap = new Map(inventory.map(i => [i.id, i]));
+  const totalCost = filtered.reduce((acc, bill) =>
+    acc + bill.items.reduce((s, item) => {
+      const inv = item.productId ? inventoryMap.get(item.productId) : null;
+      return s + (inv ? inv.costPrice * item.qty : 0);
+    }, 0), 0);
+  const grossProfit = totalRevenue - totalCost;
+  const marginPct = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+  const overhead = settings.monthlyOverhead ?? 0;
+  const bep = overhead > 0 && marginPct > 0 ? (overhead / (marginPct / 100)) : null;
+
   const inventoryChartData = [...inventory]
     .sort((a, b) => b.stock - a.stock).slice(0, 12)
     .map(item => ({
@@ -202,6 +214,41 @@ export default function ReportsPage() {
             <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{card.sub}</p>
           </div>
         ))}
+      </div>
+
+      {/* ── Financial Health Dashboard ── */}
+      <div className="glass-panel p-4 md:p-5 flex-shrink-0">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h3 className="text-sm font-bold text-slate-800">Financial Health</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Revenue · Cost · Profit · Break-Even · {rangeLabels[range]}</p>
+          </div>
+          {!overhead && (
+            <p className="text-xs text-slate-400 italic">
+              Set monthly overhead in Shop Settings to see BEP ↗
+            </p>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          {[
+            { label: "Total Revenue", value: formatCurrency(totalRevenue, settings.currency), color: "text-primary", bg: "bg-primary/8", note: `${filtered.length} bills` },
+            { label: "Total Cost", value: formatCurrency(totalCost, settings.currency), color: "text-orange-600", bg: "bg-orange-50", note: "Wholesale cost" },
+            { label: "Gross Profit", value: formatCurrency(grossProfit, settings.currency), color: grossProfit >= 0 ? "text-emerald-600" : "text-red-500", bg: grossProfit >= 0 ? "bg-emerald-50" : "bg-red-50", note: grossProfit >= 0 ? "Net addition" : "Net loss" },
+            { label: "Profit Margin", value: `${marginPct.toFixed(1)}%`, color: marginPct >= 20 ? "text-emerald-600" : marginPct >= 10 ? "text-amber-600" : "text-red-500", bg: "bg-slate-50", note: "Avg margin" },
+            {
+              label: "Break-Even Point",
+              value: bep ? formatCurrency(bep, settings.currency) : overhead ? "Calc…" : "Set overhead",
+              color: "text-violet-600", bg: "bg-violet-50",
+              note: bep ? "Monthly target" : overhead ? "Need sales data" : "Shop Settings",
+            },
+          ].map(card => (
+            <div key={card.label} className={`rounded-xl p-3 border border-slate-100 ${card.bg}`}>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1">{card.label}</p>
+              <p className={`text-base font-extrabold leading-tight ${card.color}`}>{card.value}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">{card.note}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Trading-style Revenue Chart ── */}

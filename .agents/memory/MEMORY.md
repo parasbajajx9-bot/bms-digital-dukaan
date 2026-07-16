@@ -1,0 +1,3 @@
+- [BMS Storage Architecture](bms-storage.md) — localStorage-only app; version key `billing_version`; bump to force clean reset + re-onboarding
+- [BMS Onboarding Trigger](bms-onboarding.md) — onboarding wizard fires when `settings.shopName` is empty string; DEFAULT_SETTINGS has `shopName: ""`
+- [BMS AI Assistant](bms-ai.md) — rule-based Hinglish chatbot in AiAssistant.tsx; toggled by `settings.aiEnabled`; name from `settings.aiName`; no LLM needed

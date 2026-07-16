@@ -1,0 +1,84 @@
+Please execute the following updates to our Business Management System (BMS) application. Perform a comprehensive code audit after integration to guarantee all new features work flawlessly as modular components without breaking core billing, inventory, or ledger functions.
+
+---
+
+### STEP 1: BRANDING & GLOBAL REBRANDING
+- Update the official application name, header text, browser tab titles, and PWA manifest configurations across the entire codebase from "Paras Electro Heat Billing Terminal" or "BMS - Digital Dukaan" to: "BMS - BUSINESS MANAGEMENT SYSTEM".
+
+---
+
+### STEP 2: MOBILE UI/UX FIXES (MODALS AND RECEIPT)
+- FIXED RECEIPT PREVIEW ON MOBILE: On mobile/small viewports, hide the standard side-by-side "Receipt Preview" panel. Instead, add a fixed sticky toggle button at the bottom of the screen reading "View Receipt". Clicking it must open the full receipt preview layout inside a clean mobile pop-up modal with an easy-to-tap "Close (X)" button.
+- UNIFORM MODAL STYLING: Audit all pop-ups and modals (Shop Profile, Add New Product, Log Udhaar, Record Payment). On mobile screens, ensure they fit cleanly with equal left/right margins instead of stretching to edge boundaries. Apply Tailwind's 'rounded-xl' or 'rounded-2xl' uniformly.
+
+---
+
+### STEP 3: FINANCIAL REPORT HEALTH DASHBOARD
+- Expand the "Reports" section to include a dedicated financial analysis dashboard utilizing core business metrics:
+  1. Total Revenue: Calculated using (Price Per Unit * Units Sold) across all completed invoices.
+  2. Total Cost & Added Value: Display Total Cost (Units Sold * Cost Price per unit) and net "Added Value / Gross Profit" (Total Revenue - Total Wholesale Cost).
+  3. Average Profit Margin %: Display average margin calculated via (Added Value / Total Revenue) * 100.
+  4. Break-Even Point (BEP) Calculator: Add a settings input under Shop Settings for monthly fixed overhead costs (e.g., Rent, Bills, Salaries). Use this value along with the profit margin to display their monthly Break-Even target in total sales rupees (₹).
+
+---
+
+### STEP 4: DEDICATED HELP & SUPPORT SCREEN & DEVELOPER CONTACT
+- Create a dedicated "Help & Support" view accessible from the sidebar.
+- Implement an instant language toggle switch at the top to change the screen language between English and Hindi.
+- Lay out clean visual cards detailing app usage and features in plain terms.
+- DEDICATED CONTACT CARD: Add a clear "Contact Us / हमसे संपर्क करें" card at the bottom. Display the official support email address: bms0businessmanagementsystem@gmail.com for users to send queries or problems.
+- REMOVE GITHUB ACCESS: Audit the entire interface (including any "About Developer", footer, or sidebar links) and completely remove any public GitHub repository links, icons, or access paths to maintain a clean commercial user interface.
+
+---
+
+### STEP 5: ADVANCED AI ASSISTANT OVERLAY — DYNAMIC NAME & TOGGLE
+Implement an automated conversational AI drawer overlay accessible via an AI chat button icon.
+1. AI ON/OFF TOGGLE: Provide a prominent On/Off switch/toggle for the AI on the main interface. Turning it OFF completely hides the AI button/overlay.
+2. EDITABLE AI NAME & PERSONA: Add a text input field in Shop Profile Settings allowing the user to set a custom name for their AI Assistant (Default system variable name is "Paras"). The AI must dynamically refer to itself by this custom variable in all text greetings.
+3. STYLE & CAPABILITIES: Tone must be friendly, gentle, respectful, and culturally grounded, fully supporting English, Hindi, and everyday fluid Hinglish. Program the AI to execute actions (adding items, logging credit, displaying metrics) directly via frontend state functions. If a user command lacks critical variables, the AI must gently prompt for missing details before saving.
+4. INTEGRATED DEVELOPER BUG REPORTING: If a user tells the AI they want to send a query/complaint to the developer, the AI must automatically gather the context, compose a structured support text, and launch an email draft format targeting bms0businessmanagementsystem@gmail.com.
+
+---
+
+### STEP 6: UI CONTRAST BUG FIX & INVENTORY SEARCH SELECTOR EXPANSION
+- Fix the CSS styling bug inside the item selection dropdown wrapper on the Billing Terminal component. Ensure the item select menu lists items using a clean white or ultra-light background with crisp, highly readable dark text (`text-slate-900` or black) to fix text contrast visibility issues. Ensure proper padding and z-index so the menu overlays other elements cleanly.
+- Upgrade the selection field into a clean, unified searchable selector component so users can instantly search for products by typing directly rather than dealing with restrictive manual scroll windows.
+
+---
+
+### STEP 7: QTY PROCESSING & BACKSPACE INPUT BUG FIX
+- Fix the billing terminal text input field bug for item quantities ('Qty'). Currently, when modifying product quantities for billing, the baseline integer '1' fails to clear out cleanly upon user backspace inputs, leading to restrictive entry behaviors. 
+- Rectify input sanitation patterns so that backspacing fully clears out the value container instantly, allowing the shopkeeper to type any valid quantity number up to the maximum current stock balance (e.g., entering 50 matching exactly 50 total pieces in inventory) seamlessly without layout validation rejections.
+
+---
+
+### STEP 8: SECURITY HARDENING & DATA PROTECTION GUARDRAILS
+- Enforce strict backend validation schemas. Every database transaction must strictly utilize parameterized queries or prepared statements to completely eliminate SQL Injection paths.
+- Configure database user roles under 'least privilege' parameters, blocking administrative database schema commands or system tables from frontend connection access.
+- Apply strict context escaping for dynamic UI strings to immunize the application against Cross-Site Scripting (XSS). Ensure transaction ledgers utilize atomic balance updates or proper row locks to block data race conditions during concurrent financial entries.
+- Validate active server session tokens against object owner IDs on every endpoint request to block Insecure Direct Object Reference (IDOR) data tampering across different shop accounts. Configure secure HTTP response headers (Helmet/CSP middleware) to ensure effortless compatibility with downstream Web Application Firewalls (WAFs).
+
+---
+
+### STEP 9: CLEAN SLATE SYSTEM (NO DOCK/DUMMY DATA)
+- Remove all dummy inventory products (like 'SK GOLD'), sample billing invoices, fake reports, and mock customer ledger balances from the initial installation state. 
+- When a new user opens the app, the databases, inventory lists, and ledgers must be completely clean and empty (showing professional empty-state illustrations and guiding them to use the help section or start adding items).
+
+---
+
+### STEP 10: INTERACTIVE ONBOARDING WIZARD BY "PARAS"
+- Implement a first-time user check. If the app detects that the shop settings (Shop Name, Owner Name, etc.) are blank or unset, trigger a beautiful, welcoming modal screen before letting them access the dashboard.
+- This wizard must feature your customizable AI character (default name "Paras"). The AI must dynamically welcome them ("Namaste! Mera naam Paras hai. Aapki digital dukaan setup karne mein mai aapki madad karunga.") and ask them step-by-step to input: Their Shop Name, Owner Name, and Phone Number. Once completed, unlock the clean main dashboard with a success confirmation.
+
+---
+
+### STEP 11: GOOGLE SIGN-IN & GOOGLE FIREBASE FREE CLOUD STORAGE INTEGRATION
+- Integrate Google Firebase to handle authentication and remote database storage:
+  1. Google Authentication (Gmail Login): Add a secure "Login with Google" button on the onboarding/login screen.
+  2. Cloud Document Storage: Configure Google Firestore to store user profiles, inventories, bills, and ledger records securely under each user's unique UID. 
+  3. Ensure the configurations take full advantage of Google Firebase's free tier (up to 50k reads/20k writes daily) to keep hosting costs completely free until high user scaling is achieved.
+
+---
+
+### STEP 12: FINAL SYSTEM INTEGRATION CHECK
+- Run a comprehensive post-deployment verification check. Confirm that the application's underlying global states compile correctly, text validation fields respond fluidly, and that adding new system options or toggle behaviors causes zero functional disruptions across traditional manual layouts.

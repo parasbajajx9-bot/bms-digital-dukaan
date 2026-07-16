@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Billing & Khata App"
+title = "BMS - Digital Dukaan"
 version = "1.0.0"
 id = "artifacts/billing-app"
 router = "path"

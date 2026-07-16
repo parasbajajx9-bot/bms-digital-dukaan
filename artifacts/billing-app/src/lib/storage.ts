@@ -54,6 +54,9 @@ export type ShopSettings = {
   lowStockThreshold: number;
   currency: 'INR' | 'USD';
   globalGstEnabled: boolean;
+  monthlyOverhead?: number;
+  aiEnabled?: boolean;
+  aiName?: string;
 };
 
 export type Bill = {
@@ -78,10 +81,10 @@ export type Bill = {
 };
 
 const DEFAULT_SETTINGS: ShopSettings = {
-  shopName: "My Digital Dukaan",
-  ownerName: "Owner Name",
-  phone: "9876543210",
-  address: "123 Main Bazaar",
+  shopName: "",
+  ownerName: "",
+  phone: "",
+  address: "",
   gstin: "",
   thankYouMessage: "Thank you for shopping with us!",
   termsConditions: "Goods once sold will not be returned.",
@@ -89,118 +92,34 @@ const DEFAULT_SETTINGS: ShopSettings = {
   lowStockThreshold: 5,
   currency: 'INR',
   globalGstEnabled: true,
+  monthlyOverhead: 0,
+  aiEnabled: true,
+  aiName: "Paras",
 };
 
-const INITIAL_INVENTORY: Omit<InventoryItem, 'id' | 'createdAt'>[] = [
-  { name: "Rice 5kg", sku: "RICE-5", sellingPrice: 350, costPrice: 300, stock: 20, lowStockThreshold: 5, category: "Grains" },
-  { name: "Cooking Oil 1L", sku: "OIL-1L", sellingPrice: 150, costPrice: 130, stock: 15, lowStockThreshold: 5, category: "Oils" },
-  { name: "Sugar 1kg", sku: "SUG-1", sellingPrice: 45, costPrice: 38, stock: 50, lowStockThreshold: 10, category: "Groceries" },
-  { name: "Toor Dal 500g", sku: "DAL-500", sellingPrice: 85, costPrice: 70, stock: 30, lowStockThreshold: 5, category: "Pulses" },
-  { name: "Tea Powder 250g", sku: "TEA-250", sellingPrice: 120, costPrice: 100, stock: 25, lowStockThreshold: 5, category: "Beverages" },
-  { name: "Salt 1kg", sku: "SALT-1", sellingPrice: 25, costPrice: 18, stock: 40, lowStockThreshold: 10, category: "Groceries" },
-  { name: "Atta 10kg", sku: "ATTA-10", sellingPrice: 420, costPrice: 380, stock: 10, lowStockThreshold: 3, category: "Grains" },
-  { name: "Soap bar", sku: "SOAP", sellingPrice: 35, costPrice: 28, stock: 60, lowStockThreshold: 15, category: "Personal Care" },
-  { name: "Biscuit pack", sku: "BISC", sellingPrice: 20, costPrice: 16, stock: 100, lowStockThreshold: 20, category: "Snacks" },
-  { name: "Shampoo sachet", sku: "SHAMP", sellingPrice: 2, costPrice: 1.5, stock: 200, lowStockThreshold: 50, category: "Personal Care" }
-];
-
-const STORAGE_VERSION = "v2";
-
-function daysAgo(n: number) {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return d.toISOString();
-}
+// v3: Clean slate — no seed data, shop starts fresh with onboarding wizard
+const STORAGE_VERSION = "v3";
 
 function initializeStorage() {
   const currentVersion = localStorage.getItem('billing_version');
   if (currentVersion !== STORAGE_VERSION) {
-    ['billing_shopSettings', 'billing_inventory', 'billing_customers', 'billing_transactions', 'billing_bills'].forEach(k => localStorage.removeItem(k));
+    ['billing_shopSettings', 'billing_inventory', 'billing_customers',
+     'billing_transactions', 'billing_bills', 'billing_invoice_counter'].forEach(k => localStorage.removeItem(k));
     localStorage.setItem('billing_version', STORAGE_VERSION);
   }
 
   if (!localStorage.getItem('billing_shopSettings')) {
     localStorage.setItem('billing_shopSettings', JSON.stringify(DEFAULT_SETTINGS));
   }
-
-  let inventoryItems: InventoryItem[] = [];
   if (!localStorage.getItem('billing_inventory')) {
-    inventoryItems = INITIAL_INVENTORY.map(item => ({
-      ...item,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString()
-    }));
-    localStorage.setItem('billing_inventory', JSON.stringify(inventoryItems));
-  } else {
-    inventoryItems = JSON.parse(localStorage.getItem('billing_inventory')!);
+    localStorage.setItem('billing_inventory', JSON.stringify([]));
   }
-
-  let customers: Customer[] = [];
   if (!localStorage.getItem('billing_customers')) {
-    customers = [
-      { id: crypto.randomUUID(), name: "Ramesh Kumar", phone: "9876501234", address: "12 Gandhi Nagar", createdAt: daysAgo(30) },
-      { id: crypto.randomUUID(), name: "Sunita Devi", phone: "9845678901", address: "5 Laxmi Colony", createdAt: daysAgo(20) },
-      { id: crypto.randomUUID(), name: "Mohan Lal", phone: "9912345678", address: "Near Hanuman Mandir", createdAt: daysAgo(15) },
-      { id: crypto.randomUUID(), name: "Priya Sharma", phone: "9733456789", address: "Plot 7, Sector 4", createdAt: daysAgo(10) },
-    ];
-    localStorage.setItem('billing_customers', JSON.stringify(customers));
-  } else {
-    customers = JSON.parse(localStorage.getItem('billing_customers')!);
+    localStorage.setItem('billing_customers', JSON.stringify([]));
   }
-
   if (!localStorage.getItem('billing_bills')) {
-    const shop = DEFAULT_SETTINGS;
-    const items0 = inventoryItems.slice(0, 3);
-    const bills: Bill[] = [
-      {
-        id: crypto.randomUUID(), billNumber: "INV-0001",
-        customerId: customers[0]?.id, customerName: customers[0]?.name,
-        items: [{ productId: items0[0]?.id, name: items0[0]?.name ?? "Rice 5kg", qty: 2, rate: 350, discount: 0, amount: 700 }],
-        subtotal: 700, discount: 0, gstEnabled: false, gstRate: 0, cgst: 0, sgst: 0, igst: 0,
-        total: 700, paymentMethod: 'cash', status: 'paid', shopSettings: shop, createdAt: daysAgo(5),
-      },
-      {
-        id: crypto.randomUUID(), billNumber: "INV-0002",
-        customerId: customers[1]?.id, customerName: customers[1]?.name,
-        items: [
-          { productId: items0[1]?.id, name: items0[1]?.name ?? "Cooking Oil 1L", qty: 1, rate: 150, discount: 0, amount: 150 },
-          { productId: items0[2]?.id, name: items0[2]?.name ?? "Sugar 1kg", qty: 2, rate: 45, discount: 0, amount: 90 },
-        ],
-        subtotal: 240, discount: 0, gstEnabled: false, gstRate: 0, cgst: 0, sgst: 0, igst: 0,
-        total: 240, paymentMethod: 'upi', status: 'paid', shopSettings: shop, createdAt: daysAgo(3),
-      },
-      {
-        id: crypto.randomUUID(), billNumber: "INV-0003",
-        customerId: customers[2]?.id, customerName: customers[2]?.name,
-        items: [{ name: "Toor Dal 500g", qty: 3, rate: 85, discount: 0, amount: 255 }],
-        subtotal: 255, discount: 0, gstEnabled: false, gstRate: 0, cgst: 0, sgst: 0, igst: 0,
-        total: 255, paymentMethod: 'credit', status: 'credit', shopSettings: shop, createdAt: daysAgo(2),
-      },
-      {
-        id: crypto.randomUUID(), billNumber: "INV-0004",
-        customerId: customers[3]?.id, customerName: customers[3]?.name,
-        items: [
-          { name: "Atta 10kg", qty: 1, rate: 420, discount: 0, amount: 420 },
-          { name: "Salt 1kg", qty: 2, rate: 25, discount: 0, amount: 50 },
-        ],
-        subtotal: 470, discount: 0, gstEnabled: true, gstRate: 5, cgst: 11.75, sgst: 11.75, igst: 0,
-        total: 493.5, paymentMethod: 'cash', status: 'paid', shopSettings: shop, createdAt: daysAgo(1),
-      },
-    ];
-    localStorage.setItem('billing_bills', JSON.stringify(bills));
-
-    const transactions: Transaction[] = [
-      { id: crypto.randomUUID(), customerId: customers[0]?.id ?? '', type: 'udhaar', amount: 500, note: "Monthly grocery credit", date: daysAgo(7) },
-      { id: crypto.randomUUID(), customerId: customers[0]?.id ?? '', type: 'payment', amount: 300, note: "Partial payment - cash", date: daysAgo(4) },
-      { id: crypto.randomUUID(), customerId: customers[1]?.id ?? '', type: 'udhaar', amount: 350, note: "Weekly groceries on credit", date: daysAgo(6) },
-      { id: crypto.randomUUID(), customerId: customers[1]?.id ?? '', type: 'payment', amount: 350, note: "Full settlement via UPI", date: daysAgo(3) },
-      { id: crypto.randomUUID(), customerId: customers[2]?.id ?? '', type: 'udhaar', amount: 255, note: "INV-0003 credit", date: daysAgo(2) },
-      { id: crypto.randomUUID(), customerId: customers[3]?.id ?? '', type: 'udhaar', amount: 180, note: "Advance purchase", date: daysAgo(5) },
-      { id: crypto.randomUUID(), customerId: customers[3]?.id ?? '', type: 'payment', amount: 180, note: "Paid in full", date: daysAgo(1) },
-    ];
-    localStorage.setItem('billing_transactions', JSON.stringify(transactions));
+    localStorage.setItem('billing_bills', JSON.stringify([]));
   }
-
   if (!localStorage.getItem('billing_transactions')) {
     localStorage.setItem('billing_transactions', JSON.stringify([]));
   }
@@ -208,7 +127,7 @@ function initializeStorage() {
 
 initializeStorage();
 
-// ─── Currency formatter ───────────────────────────────────────────────────────
+// ─── Currency formatter ──────────────────────────────────────────────────────
 export function formatCurrency(amount: number, currency: 'INR' | 'USD' = 'INR'): string {
   if (currency === 'USD') {
     return `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -241,17 +160,13 @@ export const storage = {
   deleteInventoryItem: (id: string) => {
     storage.saveInventory(storage.getInventory().filter(i => i.id !== id));
   },
-  // Deduct sold quantities from inventory stock
   deductInventoryStock: (items: BillItem[]) => {
     const inventory = storage.getInventory();
     let changed = false;
     items.forEach(billItem => {
       if (!billItem.productId) return;
       const inv = inventory.find(i => i.id === billItem.productId);
-      if (inv) {
-        inv.stock = Math.max(0, inv.stock - billItem.qty);
-        changed = true;
-      }
+      if (inv) { inv.stock = Math.max(0, inv.stock - billItem.qty); changed = true; }
     });
     if (changed) {
       storage.saveInventory(inventory);
@@ -268,7 +183,6 @@ export const storage = {
     storage.saveCustomers(customers);
     return newCustomer;
   },
-  // Reassign transactions to suspense account instead of deleting them
   deleteCustomer: (id: string) => {
     storage.saveCustomers(storage.getCustomers().filter(c => c.id !== id));
     const txns = storage.getTransactions().map(t =>
@@ -290,7 +204,6 @@ export const storage = {
   getBills: (): Bill[] => JSON.parse(localStorage.getItem('billing_bills') || '[]'),
   saveBills: (bills: Bill[]) => localStorage.setItem('billing_bills', JSON.stringify(bills)),
 
-  // Cancel a bill: mark as cancelled, restore inventory stock
   cancelBill: (id: string) => {
     const bills = storage.getBills();
     const bill = bills.find(b => b.id === id);
@@ -298,7 +211,6 @@ export const storage = {
     bill.status = 'cancelled';
     bill.cancelledAt = new Date().toISOString();
     storage.saveBills(bills);
-    // Restore inventory stock for each item
     const inventory = storage.getInventory();
     let changed = false;
     bill.items.forEach(billItem => {
@@ -326,11 +238,11 @@ export const storage = {
     const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
     const next = counter + 1;
     localStorage.setItem('billing_invoice_counter', String(next));
-    return `PE-${next}`;
+    return `INV-${String(next).padStart(4, '0')}`;
   },
 
   peekNextInvoiceNumber: (): string => {
     const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
-    return `PE-${counter + 1}`;
+    return `INV-${String(counter + 1).padStart(4, '0')}`;
   },
 };
