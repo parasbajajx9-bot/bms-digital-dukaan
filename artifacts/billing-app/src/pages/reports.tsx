@@ -82,10 +82,22 @@ export default function ReportsPage() {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [analyticsTab, setAnalyticsTab] = useState<"inventory" | "customers">("inventory");
   const [inventory, setInventory] = useState(storage.getInventory());
+  const [outstandingUdhaar, setOutstandingUdhaar] = useState(0);
 
   useEffect(() => {
     setBills(storage.getBills());
     setInventory(storage.getInventory());
+    // Calculate outstanding udhaar (all-time, real balances)
+    const txns = storage.getTransactions();
+    const custs = storage.getCustomers();
+    const total = custs.reduce((acc, c) => {
+      const bal = txns
+        .filter(t => t.customerId === c.id)
+        .reduce((s, t) => (t.type === "udhaar" ? s + t.amount : s - t.amount), 0);
+      return acc + Math.max(0, bal);
+    }, 0);
+    setOutstandingUdhaar(total);
+
     const handler = () => setInventory(storage.getInventory());
     window.addEventListener("inventory-updated", handler);
     return () => window.removeEventListener("inventory-updated", handler);
@@ -229,7 +241,7 @@ export default function ReportsPage() {
             </p>
           )}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {[
             { label: "Total Revenue", value: formatCurrency(totalRevenue, settings.currency), color: "text-primary", bg: "bg-primary/8", note: `${filtered.length} bills` },
             { label: "Total Cost", value: formatCurrency(totalCost, settings.currency), color: "text-orange-600", bg: "bg-orange-50", note: "Wholesale cost" },
@@ -240,6 +252,13 @@ export default function ReportsPage() {
               value: bep ? formatCurrency(bep, settings.currency) : overhead ? "Calc…" : "Set overhead",
               color: "text-violet-600", bg: "bg-violet-50",
               note: bep ? "Monthly target" : overhead ? "Need sales data" : "Shop Settings",
+            },
+            {
+              label: "Outstanding Udhaar",
+              value: formatCurrency(outstandingUdhaar, settings.currency),
+              color: outstandingUdhaar > 0 ? "text-red-600" : "text-emerald-600",
+              bg: outstandingUdhaar > 0 ? "bg-red-50" : "bg-emerald-50",
+              note: outstandingUdhaar > 0 ? "Pending recovery" : "All clear ✓",
             },
           ].map(card => (
             <div key={card.label} className={`rounded-xl p-3 border border-slate-100 ${card.bg}`}>

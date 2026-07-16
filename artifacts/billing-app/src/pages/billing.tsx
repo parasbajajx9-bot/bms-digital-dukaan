@@ -27,7 +27,8 @@ export default function BillingPage() {
   // ── Qty as string so backspace clears properly ──
   const [qtyRaw, setQtyRaw] = useState<string>("1");
 
-  const [itemDiscount, setItemDiscount] = useState<number>(0);
+  const [discountRaw, setDiscountRaw] = useState<string>("");
+  const itemDiscount = parseFloat(discountRaw) || 0;
   const [discountMode, setDiscountMode] = useState<"pct" | "flat">("pct");
 
   const [customerName, setCustomerName] = useState("");
@@ -43,9 +44,30 @@ export default function BillingPage() {
   useEffect(() => {
     setInventory(storage.getInventory());
     setPreviewInvoiceNo(storage.peekNextInvoiceNumber());
-    const handler = () => setInventory(storage.getInventory());
-    window.addEventListener("inventory-updated", handler);
-    return () => window.removeEventListener("inventory-updated", handler);
+    const invHandler = () => setInventory(storage.getInventory());
+    window.addEventListener("inventory-updated", invHandler);
+
+    // AI pre-fill: set search / select item + qty
+    const aiHandler = (e: Event) => {
+      const { itemName, qty } = (e as CustomEvent).detail as { itemName: string; qty: number };
+      const inv = storage.getInventory();
+      const match = inv.find(i => i.name.toLowerCase().includes((itemName as string).toLowerCase()));
+      if (match) {
+        setSelectedItemId(match.id);
+        setItemSearch(match.name);
+        setDropdownOpen(false);
+        if (qty) setQtyRaw(String(qty));
+      } else {
+        setItemSearch(itemName);
+        setDropdownOpen(true);
+      }
+    };
+    window.addEventListener("ai-prefill-bill-item", aiHandler);
+
+    return () => {
+      window.removeEventListener("inventory-updated", invHandler);
+      window.removeEventListener("ai-prefill-bill-item", aiHandler);
+    };
   }, []);
 
   // Close item dropdown on outside click
@@ -115,7 +137,7 @@ export default function BillingPage() {
     setSelectedItemId("");
     setItemSearch("");
     setQtyRaw("1");
-    setItemDiscount(0);
+    setDiscountRaw("");
     toast.success(`${item.name} added to bill.`);
   };
 
@@ -410,7 +432,7 @@ export default function BillingPage() {
             <div className="flex items-center justify-between">
               <Label className="text-slate-700 text-sm">Discount</Label>
               <button
-                onClick={() => { setDiscountMode(m => m === "pct" ? "flat" : "pct"); setItemDiscount(0); }}
+                onClick={() => { setDiscountMode(m => m === "pct" ? "flat" : "pct"); setDiscountRaw(""); }}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors bg-white border-slate-200 text-slate-500 hover:border-primary/40 hover:text-primary"
               >
                 {discountMode === "pct"
@@ -420,9 +442,11 @@ export default function BillingPage() {
             </div>
             <div className="relative">
               <Input
-                type="number" min="0" max={discountMode === "pct" ? 100 : undefined}
-                value={itemDiscount}
-                onChange={(e) => setItemDiscount(Number(e.target.value))}
+                type="text"
+                inputMode="decimal"
+                value={discountRaw}
+                onChange={(e) => setDiscountRaw(e.target.value.replace(/[^0-9.]/g, ""))}
+                onBlur={() => { if (!discountRaw.trim()) setDiscountRaw(""); }}
                 className="bg-white pr-10"
                 placeholder={discountMode === "pct" ? "0" : "0.00"}
               />

@@ -44,6 +44,25 @@ export default function InventoryPage() {
 
   useEffect(() => { reload(); }, []);
 
+  // AI: pre-fill add-product dialog
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const d = (e as CustomEvent).detail as { name: string; costPrice: number; sellingPrice: number; stock: number };
+      setForm({
+        ...emptyForm,
+        name: d.name ?? "",
+        costPrice: String(d.costPrice ?? ""),
+        sellingPrice: String(d.sellingPrice ?? ""),
+        stock: String(d.stock ?? "0"),
+      });
+      setFormErrors({});
+      setEditingId(null);
+      setModalMode("add");
+    };
+    window.addEventListener("ai-prefill-product", handler);
+    return () => window.removeEventListener("ai-prefill-product", handler);
+  }, []);
+
   const adjustStock = (id: string, delta: number) => {
     const item = items.find((i) => i.id === id);
     if (!item) return;

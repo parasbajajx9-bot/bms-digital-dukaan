@@ -40,6 +40,31 @@ export default function KhataPage() {
 
   useEffect(() => { reload(); }, []);
 
+  // AI: pre-fill udhaar for a customer
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { customerName, amount } = (e as CustomEvent).detail as { customerName: string; amount: number };
+      reload();
+      const allCustomers = storage.getCustomers();
+      const match = allCustomers.find(c =>
+        c.name.toLowerCase().includes((customerName as string).toLowerCase().trim())
+      );
+      if (match) {
+        setSelectedCustomer(match);
+        setUdhaarAmount(String(amount));
+        setUdhaarNote("AI Assistant se");
+        setUdhaarOpen(true);
+      } else {
+        // Customer not found – pre-fill add-customer form
+        setNewName(customerName);
+        setAddCustomerOpen(true);
+        toast(`"${customerName}" nahi mila. Pehle add karein, fir udhaar log karein.`);
+      }
+    };
+    window.addEventListener("ai-prefill-udhaar", handler);
+    return () => window.removeEventListener("ai-prefill-udhaar", handler);
+  }, []);
+
   const getBalance = (customerId: string) =>
     transactions
       .filter((t) => t.customerId === customerId)

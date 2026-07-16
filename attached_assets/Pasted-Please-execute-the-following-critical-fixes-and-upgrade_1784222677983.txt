@@ -1,0 +1,46 @@
+Please execute the following critical fixes and upgrades to our Business Management System (BMS) application. A recent deployment introduced functional bugs and limitations in the AI behavior. Resolve these issues immediately while maintaining all existing security, branding, and styling rules.
+
+---
+
+### STEP 1: FIX THE "STICKY INPUT" BUG (QTY, DISCOUNT %, & BEP OVERHEAD)
+- The quantity ('Qty'), 'Discount %' inputs in the Billing Terminal, and the 'Break-Even Fixed Cost' input in Shop Settings suffer from a restrictive state binding bug. When a user backspaces, the default values (like '1' or '0') do not clear out, preventing clean manual typing.
+- RECTIFY THE STATE BINDINGS: Update the `onChange` handlers for these inputs. Allow the input values to temporarily hold an empty string (`""`) or null state so the user can backspace completely. 
+- Ensure that if the field is empty, it does not crash the calculations. Instead, fall back to default values internally (e.g., treating empty quantity as 1, empty discount as 0, or empty BEP as 0) *only* when processing the final bill, while keeping the text field physically empty for the user to type freely.
+
+---
+
+### STEP 2: SYNC UDHAAR (CREDIT LEDGER) WITH FINANCIAL ANALYSIS & REPORTS
+- Currently, when credit (Udhaar) is logged for a customer, the financial analysis dashboard and reports do not reflect this transaction in the business metrics.
+- RESTRUCTURE THE DATA FLOW: Ensure that the global state/context or Firestore database listener triggers an update across both modules. 
+- Any recorded Udhaar/credit transaction must be instantly factored into the dashboard analysis:
+  1. Add outstanding Udhaar to a new "Total Outstanding Credit" metric on the dashboard.
+  2. Include completed credit sales under "Total Sales / Revenue" if the vendor runs accrual-based accounting, or clearly categorize it under a "Credit vs. Cash Sales" analytics breakdown so the merchant has 100% accurate daily financial synchronization.
+
+---
+
+### STEP 3: UPGRADE "PARAS" TO A POWERFUL CONVERSATIONAL AI (LLM + VOICE + ACTION TOOLS)
+- The current AI implementation is too limited and behaves like a rigid chatbot. We need "Paras" to function like an advanced LLM (e.g., ChatGPT/Gemini/Claude) capable of understanding natural language, processing voice, and actively controlling the website.
+
+1. INTEGRATE NATIVE VOICE SPEECH-TO-TEXT:
+   - Add a prominent microphone icon next to the AI input bar.
+   - Integrate the browser's native `Web Speech API` (specifically `webkitSpeechRecognition` / `SpeechRecognition`). When clicked, the mic must capture the user's spoken Hindi, English, or Hinglish, convert it instantly to text in the input box, and automatically submit it to the AI.
+
+2. TRANSITION TO FUNCTION CALLING (ACTION CAPABILITIES):
+   - Do not use simple keyword matching. Setup a system prompt that models Paras as an advanced AI agent with a specific toolset.
+   - Give the AI direct access to call your frontend state functions. Provide the AI with structured function tools like:
+     * `addNewProduct(name, costPrice, sellingPrice, stockQuantity, barcode)`
+     * `addBillItem(productName, quantity, discount)`
+     * `logUdhaar(customerName, amount)`
+     * `navigateToTab(tabName)` (e.g., "reports", "billing", "inventory")
+   - If a user says "Ramesh ka 500 ka udhaar likho" or "Sona Chandi item add karo khareed 100 bech 150 quantity 20", the AI must parse the natural language, map the variables, execute the respective function tool, and reply with a warm Hinglish confirmation: "Ji bilkul, maine Ramesh ke khate mein ₹500 ka udhaar log kar diya hai!"
+
+3. CONFIRMATION STEP FOR DATA MUTATION:
+   - Before the AI executes any write action (like saving a new bill or modifying inventory), it must display an on-screen "Action Preview Card" in the chat window showing what it understood (e.g., "Add 50 SK Gold to Bill?"). Provide simple "Yes, Save" and "Cancel" buttons to ensure 100% user safety and accuracy.
+
+---
+
+### STEP 4: VERIFY RE-ENTRANCY, LAYOUT, & INTEGRATION
+- After implementing these fixes, run a deep audit of the code to ensure:
+  1. No state conflicts exist between the new searchable item selector and the Qty/Discount inputs.
+  2. The Google Firebase database seamlessly stores both cash sales and credit ledger (Udhaar) entries synchronously.
+  3. The AI "Paras" can be toggled completely ON/OFF via the main UI switch as previously built.
