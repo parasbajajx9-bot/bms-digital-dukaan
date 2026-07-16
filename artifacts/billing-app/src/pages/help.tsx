@@ -1,121 +1,90 @@
 import React, { useState } from "react";
 import {
   Calculator, PackageSearch, FileText, BarChart3, BookOpen, Settings,
-  Mail, HelpCircle, Languages,
+  Mail, HelpCircle,
 } from "lucide-react";
 
-type Lang = "en" | "hi";
+type Lang = "en" | "hi" | "hl";
 
 const content = {
   en: {
     title: "Help & Support",
     subtitle: "Everything you need to run your shop smoothly",
-    langBtn: "हिंदी में देखें",
     features: [
-      {
-        icon: Calculator,
-        title: "Billing Terminal",
-        desc: "Create bills instantly. Search and add items from your inventory, apply GST, give discounts, accept Cash / UPI / Card / Credit (Udhaar), and print or share receipts on WhatsApp.",
-        color: "text-primary bg-primary/8",
-      },
-      {
-        icon: PackageSearch,
-        title: "Inventory Management",
-        desc: "Add products with selling price, cost price, HSN code, and category. Track live stock levels with low-stock alerts. Edit quantities directly or let billing deduct stock automatically.",
-        color: "text-emerald-600 bg-emerald-50",
-      },
-      {
-        icon: FileText,
-        title: "Invoices & History",
-        desc: "View all past bills with filters by payment type and status. Mark credit bills as paid, or cancel a bill to restore stock automatically.",
-        color: "text-violet-600 bg-violet-50",
-      },
-      {
-        icon: BarChart3,
-        title: "Reports & Analytics",
-        desc: "See revenue, profit, GST summary, and break-even target. Export data as a CSV file for GST filing. View bar charts, pie charts, and customer spend analysis.",
-        color: "text-amber-600 bg-amber-50",
-      },
-      {
-        icon: BookOpen,
-        title: "Khata Ledger (Udhaar)",
-        desc: "Track credit given to each customer. Add udhaar entries, record payments, and see who owes what at a glance. All transactions are timestamped.",
-        color: "text-rose-600 bg-rose-50",
-      },
-      {
-        icon: Settings,
-        title: "Shop Settings",
-        desc: "Set your shop name, owner name, address, phone, GSTIN, and thank-you message. Configure monthly overhead for BEP calculation. Enable or disable GST features globally.",
-        color: "text-slate-600 bg-slate-100",
-      },
+      { icon: Calculator,   title: "Billing Terminal",          color: "text-primary bg-primary/8",       desc: "Create bills instantly. Search and add items from your inventory, apply GST, give discounts, accept Cash / UPI / Card / Credit (Udhaar), and print or share receipts on WhatsApp." },
+      { icon: PackageSearch,title: "Inventory Management",      color: "text-emerald-600 bg-emerald-50",  desc: "Add products with selling price, cost price, HSN code, and category. Track live stock levels with low-stock alerts. Edit quantities directly or let billing deduct stock automatically." },
+      { icon: FileText,     title: "Invoices & History",        color: "text-violet-600 bg-violet-50",    desc: "View all past bills with filters by payment type and status. Mark credit bills as paid, or cancel a bill to restore stock automatically." },
+      { icon: BarChart3,    title: "Reports & Analytics",       color: "text-amber-600 bg-amber-50",      desc: "See revenue, profit, GST summary, and break-even target. Export data as a CSV file for GST filing. View bar charts, pie charts, and customer spend analysis." },
+      { icon: BookOpen,     title: "Khata Ledger (Udhaar)",     color: "text-rose-600 bg-rose-50",        desc: "Track credit given to each customer. Add udhaar entries, record payments, and see who owes what at a glance. All transactions are timestamped." },
+      { icon: Settings,     title: "Shop Settings",             color: "text-slate-600 bg-slate-100",     desc: "Set your shop name, owner name, address, phone, GSTIN, and thank-you message. Configure monthly overhead for BEP calculation. Enable or disable GST features globally." },
     ],
     faq: [
-      { q: "How do I add a new product?", a: "Go to Inventory → click the '+' button at the top right → fill in the product details and save." },
-      { q: "How does stock get deducted?", a: "When you finalize a bill, stock is automatically deducted for each item that has a matching inventory entry." },
-      { q: "What is Break-Even Point (BEP)?", a: "BEP tells you the minimum monthly revenue needed to cover your fixed costs. Set your monthly overhead (rent, salaries, bills) in Shop Settings to see it on the Reports page." },
-      { q: "Can I use this offline?", a: "Yes! All data is saved locally on your device. The app works fully offline once loaded. You can also install it as a PWA for a faster, app-like experience." },
-      { q: "How do I print a receipt?", a: "Open the Billing Terminal, add your items, then click 'Print / PDF'. The receipt will open in your browser's print dialog." },
+      { q: "How do I add a new product?",      a: "Go to Inventory → click the '+' button at the top right → fill in the product details and save." },
+      { q: "How does stock get deducted?",     a: "When you finalize a bill, stock is automatically deducted for each item that has a matching inventory entry." },
+      { q: "What is Break-Even Point (BEP)?",  a: "BEP tells you the minimum monthly revenue needed to cover your fixed costs. Set your monthly overhead (rent, salaries, bills) in Shop Settings to see it on the Reports page." },
+      { q: "Can I use this offline?",          a: "Yes! All data is saved locally on your device. The app works fully offline once loaded. You can also install it as a PWA for a faster, app-like experience." },
+      { q: "How do I print a receipt?",        a: "Open the Billing Terminal, add your items, then click 'Print / PDF'. The receipt will open in your browser's print dialog." },
     ],
+    faqTitle: "Frequently Asked Questions",
     contactTitle: "Contact Us",
     contactSub: "Having trouble or want to send feedback? Email us directly.",
-    contactEmail: "bms0businessmanagementsystem@gmail.com",
     contactBtn: "Send an Email",
   },
   hi: {
     title: "सहायता और समर्थन",
     subtitle: "अपनी दुकान आसानी से चलाने के लिए सब कुछ यहाँ है",
-    langBtn: "See in English",
     features: [
-      {
-        icon: Calculator,
-        title: "बिलिंग टर्मिनल",
-        desc: "तुरंत बिल बनाएं। इन्वेंटरी से आइटम खोजें, GST लगाएं, डिस्काउंट दें, नकद / UPI / कार्ड / उधार स्वीकार करें, और WhatsApp पर रसीद भेजें।",
-        color: "text-primary bg-primary/8",
-      },
-      {
-        icon: PackageSearch,
-        title: "इन्वेंटरी प्रबंधन",
-        desc: "बिक्री मूल्य, लागत मूल्य, HSN कोड और श्रेणी के साथ उत्पाद जोड़ें। कम स्टॉक अलर्ट के साथ लाइव स्टॉक देखें। बिलिंग करने पर स्टॉक अपने आप कम होता है।",
-        color: "text-emerald-600 bg-emerald-50",
-      },
-      {
-        icon: FileText,
-        title: "चालान और इतिहास",
-        desc: "भुगतान प्रकार और स्थिति के अनुसार सभी पुराने बिल देखें। क्रेडिट बिल को भुगतान किया गया मार्क करें या बिल रद्द करके स्टॉक वापस पाएं।",
-        color: "text-violet-600 bg-violet-50",
-      },
-      {
-        icon: BarChart3,
-        title: "रिपोर्ट और विश्लेषण",
-        desc: "राजस्व, लाभ, GST सारांश और ब्रेक-ईवन लक्ष्य देखें। GST फाइलिंग के लिए CSV डाउनलोड करें। बार चार्ट, पाई चार्ट और ग्राहक खर्च विश्लेषण देखें।",
-        color: "text-amber-600 bg-amber-50",
-      },
-      {
-        icon: BookOpen,
-        title: "खाता बही (उधार)",
-        desc: "हर ग्राहक का उधार ट्रैक करें। उधार एंट्री जोड़ें, भुगतान दर्ज करें, और देखें कि कौन कितना बकाया है। सभी लेनदेन की तारीख और समय दर्ज है।",
-        color: "text-rose-600 bg-rose-50",
-      },
-      {
-        icon: Settings,
-        title: "दुकान सेटिंग्स",
-        desc: "दुकान का नाम, मालिक का नाम, पता, फोन, GSTIN और धन्यवाद संदेश सेट करें। BEP गणना के लिए मासिक ओवरहेड कॉन्फ़िगर करें।",
-        color: "text-slate-600 bg-slate-100",
-      },
+      { icon: Calculator,   title: "बिलिंग टर्मिनल",       color: "text-primary bg-primary/8",       desc: "तुरंत बिल बनाएं। इन्वेंटरी से आइटम खोजें, GST लगाएं, डिस्काउंट दें, नकद / UPI / कार्ड / उधार स्वीकार करें, और WhatsApp पर रसीद भेजें।" },
+      { icon: PackageSearch,title: "इन्वेंटरी प्रबंधन",   color: "text-emerald-600 bg-emerald-50",  desc: "बिक्री मूल्य, लागत मूल्य, HSN कोड और श्रेणी के साथ उत्पाद जोड़ें। कम स्टॉक अलर्ट के साथ लाइव स्टॉक देखें। बिलिंग करने पर स्टॉक अपने आप कम होता है।" },
+      { icon: FileText,     title: "चालान और इतिहास",     color: "text-violet-600 bg-violet-50",    desc: "भुगतान प्रकार और स्थिति के अनुसार सभी पुराने बिल देखें। क्रेडिट बिल को भुगतान किया गया मार्क करें या बिल रद्द करके स्टॉक वापस पाएं।" },
+      { icon: BarChart3,    title: "रिपोर्ट और विश्लेषण", color: "text-amber-600 bg-amber-50",      desc: "राजस्व, लाभ, GST सारांश और ब्रेक-ईवन लक्ष्य देखें। GST फाइलिंग के लिए CSV डाउनलोड करें। बार चार्ट, पाई चार्ट और ग्राहक खर्च विश्लेषण देखें।" },
+      { icon: BookOpen,     title: "खाता बही (उधार)",     color: "text-rose-600 bg-rose-50",        desc: "हर ग्राहक का उधार ट्रैक करें। उधार एंट्री जोड़ें, भुगतान दर्ज करें, और देखें कि कौन कितना बकाया है। सभी लेनदेन की तारीख और समय दर्ज है।" },
+      { icon: Settings,     title: "दुकान सेटिंग्स",      color: "text-slate-600 bg-slate-100",     desc: "दुकान का नाम, मालिक का नाम, पता, फोन, GSTIN और धन्यवाद संदेश सेट करें। BEP गणना के लिए मासिक ओवरहेड कॉन्फ़िगर करें।" },
     ],
     faq: [
-      { q: "नया उत्पाद कैसे जोड़ें?", a: "इन्वेंटरी में जाएं → ऊपर दाएं '+' बटन पर क्लिक करें → उत्पाद की जानकारी भरें और सेव करें।" },
-      { q: "स्टॉक कैसे कम होता है?", a: "जब आप बिल फाइनल करते हैं, तो मिलान वाले इन्वेंटरी आइटम का स्टॉक अपने आप कम हो जाता है।" },
-      { q: "ब्रेक-ईवन पॉइंट क्या है?", a: "BEP बताता है कि आपकी निश्चित लागत पूरी करने के लिए कितना मासिक राजस्व चाहिए। दुकान सेटिंग्स में मासिक ओवरहेड सेट करें।" },
-      { q: "क्या यह ऑफलाइन चलता है?", a: "हाँ! सारा डेटा आपके डिवाइस में सेव होता है। एक बार लोड होने के बाद यह पूरी तरह ऑफलाइन काम करता है।" },
-      { q: "रसीद कैसे प्रिंट करें?", a: "बिलिंग टर्मिनल खोलें, आइटम जोड़ें, फिर 'Print / PDF' पर क्लिक करें।" },
+      { q: "नया उत्पाद कैसे जोड़ें?",           a: "इन्वेंटरी में जाएं → ऊपर दाएं '+' बटन पर क्लिक करें → उत्पाद की जानकारी भरें और सेव करें।" },
+      { q: "स्टॉक कैसे कम होता है?",            a: "जब आप बिल फाइनल करते हैं, तो मिलान वाले इन्वेंटरी आइटम का स्टॉक अपने आप कम हो जाता है।" },
+      { q: "ब्रेक-ईवन पॉइंट क्या है?",          a: "BEP बताता है कि आपकी निश्चित लागत पूरी करने के लिए कितना मासिक राजस्व चाहिए। दुकान सेटिंग्स में मासिक ओवरहेड सेट करें।" },
+      { q: "क्या यह ऑफलाइन चलता है?",           a: "हाँ! सारा डेटा आपके डिवाइस में सेव होता है। एक बार लोड होने के बाद यह पूरी तरह ऑफलाइन काम करता है।" },
+      { q: "रसीद कैसे प्रिंट करें?",             a: "बिलिंग टर्मिनल खोलें, आइटम जोड़ें, फिर 'Print / PDF' पर क्लिक करें।" },
     ],
+    faqTitle: "अक्सर पूछे जाने वाले सवाल",
     contactTitle: "हमसे संपर्क करें",
     contactSub: "कोई समस्या है या सुझाव देना चाहते हैं? हमें सीधे ईमेल करें।",
-    contactEmail: "bms0businessmanagementsystem@gmail.com",
     contactBtn: "ईमेल भेजें",
   },
+  hl: {
+    title: "Help aur Support",
+    subtitle: "Apni dukaan smoothly chalane ke liye sab kuch yahan hai",
+    features: [
+      { icon: Calculator,   title: "Billing Terminal",       color: "text-primary bg-primary/8",       desc: "Bill banao ek dum jaldi. Inventory se item search karo, GST lagao, discount do, Cash / UPI / Card / Udhaar accept karo, aur WhatsApp pe receipt bhejo." },
+      { icon: PackageSearch,title: "Inventory Management",  color: "text-emerald-600 bg-emerald-50",  desc: "Products ka selling price, cost price, HSN code aur category ke saath add karo. Low-stock alerts ke saath live stock dekhte raho. Billing se stock automatically cut hota hai." },
+      { icon: FileText,     title: "Invoices aur History",  color: "text-violet-600 bg-violet-50",    desc: "Purane saare bills payment type aur status ke hisaab se dekho. Credit bill ko paid mark karo, ya bill cancel karke stock wapas pao." },
+      { icon: BarChart3,    title: "Reports aur Analytics", color: "text-amber-600 bg-amber-50",      desc: "Revenue, profit, GST summary aur break-even target dekho. GST filing ke liye CSV export karo. Bar charts, pie charts aur customer spend analysis bhi hai." },
+      { icon: BookOpen,     title: "Khata Ledger (Udhaar)", color: "text-rose-600 bg-rose-50",        desc: "Har customer ka udhaar track karo. Udhaar entries add karo, payment record karo, aur ek nazar mein dekho kaun kitna baaki hai. Sab transactions ki date aur time save hoti hai." },
+      { icon: Settings,     title: "Shop Settings",         color: "text-slate-600 bg-slate-100",     desc: "Dukaan ka naam, malik ka naam, address, phone, GSTIN aur thank-you message set karo. BEP calculation ke liye monthly overhead configure karo. GST globally on/off kar sakte ho." },
+    ],
+    faq: [
+      { q: "Naya product kaise add karein?",   a: "Inventory mein jao → upar right mein '+' button dabao → product ki details bharo aur save karo." },
+      { q: "Stock kaise cut hota hai?",        a: "Jab bill finalize karte ho, toh matching inventory items ka stock apne aap kam ho jaata hai." },
+      { q: "Break-Even Point (BEP) kya hai?",  a: "BEP batata hai ki fixed costs cover karne ke liye kitna monthly revenue chahiye. Shop Settings mein monthly overhead set karo, fir Reports page pe BEP dikhega." },
+      { q: "Kya ye offline kaam karta hai?",   a: "Haan! Saara data aapke device mein locally save hota hai. Ek baar load hone ke baad puri tarah offline kaam karta hai. PWA install karke aur bhi fast experience milta hai." },
+      { q: "Receipt kaise print karein?",      a: "Billing Terminal kholo, items add karo, fir 'Print / PDF' dabao. Receipt browser ke print dialog mein khulegi." },
+    ],
+    faqTitle: "Aksar Puche Jaane Wale Sawal",
+    contactTitle: "Humse Sampark Karein",
+    contactSub: "Koi problem hai ya feedback dena chahte ho? Humhe directly email karo.",
+    contactBtn: "Email Bhejo",
+  },
 };
+
+const SUPPORT_EMAIL = "bms0businessmanagementsystem@gmail.com";
+
+const LANG_TABS: { key: Lang; label: string }[] = [
+  { key: "en", label: "English" },
+  { key: "hi", label: "हिन्दी" },
+  { key: "hl", label: "Hinglish" },
+];
 
 export default function HelpPage() {
   const [lang, setLang] = useState<Lang>("en");
@@ -132,13 +101,22 @@ export default function HelpPage() {
           </div>
           <p className="text-slate-500 text-sm">{c.subtitle}</p>
         </div>
-        <button
-          onClick={() => setLang(l => l === "en" ? "hi" : "en")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
-        >
-          <Languages size={15} />
-          {c.langBtn}
-        </button>
+        {/* 3-way language toggle */}
+        <div className="flex gap-0.5 bg-slate-100 rounded-xl p-1">
+          {LANG_TABS.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setLang(t.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                lang === t.key
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Feature cards */}
@@ -161,16 +139,12 @@ export default function HelpPage() {
 
       {/* FAQ */}
       <div className="glass-panel p-5">
-        <h2 className="text-sm font-extrabold text-slate-700 uppercase tracking-wide mb-4">
-          {lang === "en" ? "Frequently Asked Questions" : "अक्सर पूछे जाने वाले सवाल"}
-        </h2>
+        <h2 className="text-sm font-extrabold text-slate-700 uppercase tracking-wide mb-4">{c.faqTitle}</h2>
         <div className="space-y-4">
           {c.faq.map((item) => (
             <div key={item.q}>
               <p className="text-sm font-semibold text-slate-800 mb-1">Q: {item.q}</p>
-              <p className="text-sm text-slate-500 leading-relaxed pl-4 border-l-2 border-primary/30">
-                {item.a}
-              </p>
+              <p className="text-sm text-slate-500 leading-relaxed pl-4 border-l-2 border-primary/30">{item.a}</p>
             </div>
           ))}
         </div>
@@ -185,10 +159,10 @@ export default function HelpPage() {
         <p className="text-sm text-slate-500 mb-4">{c.contactSub}</p>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <code className="text-sm font-mono bg-white border border-slate-200 px-3 py-2 rounded-lg text-slate-700 break-all">
-            {c.contactEmail}
+            {SUPPORT_EMAIL}
           </code>
           <a
-            href={`mailto:${c.contactEmail}?subject=BMS Support Query`}
+            href={`mailto:${SUPPORT_EMAIL}?subject=BMS Support Query`}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors flex-shrink-0"
           >
             <Mail size={14} />
@@ -197,7 +171,6 @@ export default function HelpPage() {
         </div>
       </div>
 
-      {/* App version note */}
       <p className="text-center text-xs text-slate-400">
         BMS – Business Management System · All data stored locally on your device
       </p>

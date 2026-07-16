@@ -1,0 +1,46 @@
+Please execute the following critical structural updates, bug fixes, and UI layouts on our Business Management System (BMS). Work carefully and ensure zero console errors or state conflicts.
+
+---
+
+### STEP 1: THE AI ULTIMATUM (UPGRADE TO GEMINI-GRADE OR COMPLETELY REMOVE)
+- Evaluate the current AI Assistant implementation. If you cannot make "Paras" highly efficient, robust, and capable of actual conversational app control (e.g., parsing "Ramesh ka 500 ka udhaar likho" or "Sona Chandi item add karo" in Hindi, English, or Hinglish via native browser Web Speech API voice commands) with 100% stability:
+  -> COMPLETELY REMOVE every single line of AI code from the app. 
+  -> Strip out the floating chat button, the AI drawer modal, any AI toggle switches, and cleanup all unused AI state variables/dependencies.
+- If you can make it flawless, upgrade it to a true, API-driven voice assistant. Otherwise, clean-delete it entirely to keep the app ultra-fast and professional.
+
+---
+
+### STEP 2: CLEAN UP SCREEN SPACE (COLLAPSE MASSIVE DASHBOARD SECTIONS INTO POPUPS)
+- The main dashboard is currently too crowded. We want to hide three massive sections so they are not visible all the time:
+  1. 'Financial Health'
+  2. 'Revenue Performance' (Charts/Graphs)
+  3. 'Sales History / Recent Bills'
+- THE NEW UI FLOW: 
+  - Replace these three bulky sections on the main dashboard screen with a row of beautiful, compact, high-end "Action Cards" or "Quick-View Buttons" (e.g., [📊 View Financial Health], [📈 Revenue Performance], [📜 View Sales History]).
+  - Clicking any of these buttons must launch that specific section inside a stunning, fully-featured popup modal.
+  - Apply the exact same premium glassmorphic styling, background blur ('backdrop-blur-md bg-black/40'), and curved corner profile ('rounded-[24px]') used in the Graph Analytics modal.
+
+---
+
+### STEP 3: FIX MODAL BORDER CURVES & GLASSMORPHISM NATIONWIDE
+- BUG FIX: The "About Developer" section, "Add New Product", "Log Udhaar", "Record Payment", and "Shop Profile Settings" modals currently have sharp, uncurved corners.
+- MAKE THEM PERFECT:
+  1. Force EVERY single modal wrapper in the application to use highly curved corners: `rounded-[24px]` (or `border-radius: 24px` in CSS). Ensure background colors and headers do not bleed out or clip awkwardly.
+  2. Implement a uniform, beautiful glassmorphism effect on all modal backdrops using `backdrop-filter: blur(12px)` / Tailwind `backdrop-blur-md` so the underlying dashboard blurs elegantly when any modal is active.
+
+---
+
+### STEP 4: SYNCHRONIZE UDHAAR (CREDIT LEDGER) WITH FINANCIAL ANALYSIS
+- BUG FIX: When an Udhaar transaction is recorded (e.g., ₹2,300 for customer "paras"), it correctly appears under their customer card but is NOT showing up in the main financial analytics.
+- DATA FLOW SYNC:
+  - Update your calculation hooks or Firestore logic so that the top dashboard "Credit (Udhaar)" analytics card dynamically aggregates and displays the sum of all outstanding customer balances (like Paras's ₹2,300) in real-time.
+  - Ensure this total is fully responsive to the active time-filters ("Today", "Last 7 Days", "This Month", "All Time").
+
+---
+
+### STEP 5: THREE-LANGUAGE TOGGLE FOR HELP & SUPPORT
+- In the "Help & Support" screen, replace any simple bilingual settings with a clear, professional 3-way language toggle switch/tabs:
+  * "English"
+  * "हिन्दी" (Hindi)
+  * "Hinglish" (everyday casual Romanized Hindi, e.g., "Apna stock kaise check karein")
+- Fully translate all documentation, troubleshooting guides, and FAQs dynamically based on the selected language.

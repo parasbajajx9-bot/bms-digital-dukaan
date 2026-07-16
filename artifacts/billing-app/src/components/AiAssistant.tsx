@@ -101,6 +101,21 @@ function parseAction(text: string): PendingAction | null {
     }
   }
 
+  // 5. "Add karo" product by name only (no price) — navigate to inventory with name prefilled
+  const nameOnlyMatch = text.match(
+    /(?:add|add karo|naya|new|inventory mein)\s+(?:product|item|maal|saman)?\s*["']?([^"'\n]{2,40})["']?\s+(?:add karo|stock mein|inventory mein|daalo)?[\.\!\?]?\s*$/i
+  );
+  if (nameOnlyMatch) {
+    const name = nameOnlyMatch[1].trim();
+    if (name.length >= 2 && !/^(karo|please|add|naya|new|product|item|inventory)$/i.test(name)) {
+      return {
+        type: "addNewProduct",
+        params: { name, costPrice: 0, sellingPrice: 0, stock: 0 },
+        summary: `Open Inventory and pre-fill product name "${name}"`,
+      };
+    }
+  }
+
   return null;
 }
 
