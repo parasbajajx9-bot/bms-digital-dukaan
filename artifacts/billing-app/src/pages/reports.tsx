@@ -323,12 +323,12 @@ export default function ReportsPage() {
       {/* ── 3 Quick-View Action Cards ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-shrink-0">
         {[
-          { label: "Financial Health",    sub: "Profit · Cost · BEP · Udhaar",    Icon: Heart,     color: "text-emerald-600", bg: "bg-emerald-50",  onClick: () => setHealthOpen(true)  },
-          { label: "Revenue Performance", sub: `Daily trends · ${rangeLabels[range]}`, Icon: BarChart2, color: "text-primary",     bg: "bg-primary/8",   onClick: () => setRevenueOpen(true) },
-          { label: "Sales History",       sub: `${filtered.length} transactions`,  Icon: FileText,  color: "text-violet-600",  bg: "bg-violet-50",   onClick: () => setSalesOpen(true)   },
+          { label: "Financial Health",    sub: "Profit · Cost · BEP · Udhaar",    Icon: Heart,     color: "text-emerald-600", bg: "bg-emerald-50",  onClick: () => setHealthOpen(true),  glow: "hover:shadow-emerald-500/10 hover:border-emerald-100/50" },
+          { label: "Revenue Performance", sub: `Daily trends · ${rangeLabels[range]}`, Icon: BarChart2, color: "text-primary",     bg: "bg-primary/8",   onClick: () => setRevenueOpen(true), glow: "hover:shadow-cyan-500/10 hover:border-cyan-100/50"     },
+          { label: "Sales History",       sub: `${filtered.length} transactions`,  Icon: FileText,  color: "text-violet-600",  bg: "bg-violet-50",   onClick: () => setSalesOpen(true),   glow: "hover:shadow-purple-500/10 hover:border-purple-100/50" },
         ].map(card => (
           <button key={card.label} onClick={card.onClick}
-            className="glass-panel p-4 flex items-center gap-3 hover:shadow-md hover:border-primary/20 transition-all group text-left w-full">
+            className={`glass-panel p-4 flex items-center gap-3 hover:scale-[1.01] hover:-translate-y-[1px] hover:shadow-md ${card.glow} active:scale-[0.99] active:translate-y-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:duration-75 group text-left w-full`}>
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${card.bg}`}>
               <card.Icon size={18} className={card.color} />
             </div>

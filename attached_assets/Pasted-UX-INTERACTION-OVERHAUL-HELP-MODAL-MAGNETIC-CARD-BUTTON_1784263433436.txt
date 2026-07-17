@@ -1,0 +1,27 @@
+UX INTERACTION OVERHAUL: HELP MODAL & MAGNETIC CARD BUTTONS
+
+Please execute the following structural change and interactive styling updates cleanly:
+
+---
+
+### STEP 1: CONVERT HELP & SUPPORT TO AN AESTHETIC POPUP MODAL
+- SIDEBAR MODIFICATION: 
+  - Change the "Help & Support" list item in the sidebar footer so that clicking it no longer changes routes or mounts a huge page section.
+  - Make it open a tight, premium interactive popup modal component instead.
+- POPUP MODAL ARCHITECTURE:
+  - Container Style: 'max-w-md w-full mx-auto p-6 bg-white rounded-[24px] shadow-2xl border border-slate-100 bg-white/90 backdrop-blur-md'.
+  - Entry Transition: Animate the entry gracefully from a scale of 0.95 to 1.0 with a smooth ease-out curve.
+  - Content Layout: Stack the terminal guides cleanly in a scrollable container inside this compact popup, topped with a premium absolute-positioned Close (X) button ('text-slate-400 hover:text-slate-600 transition-colors').
+
+---
+
+### STEP 2: HIGH-END TACTILE & GLOWING BUTTON STATES
+- LOCATE: The three wide action buttons shown in the layout layout ("Financial Health", "Revenue Performance", "Sales History").
+- RE-ENGINEER INTERACTIVE HOVER EFFECTS:
+  - Add dynamic hover-scaling: 'hover:scale-[1.01] hover:-translate-y-[1px] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]'.
+  - Add ambient glow color effects based on the icon backgrounds:
+    - Financial Health card: On hover, apply a soft green ambient shadow drop ('hover:shadow-md hover:shadow-emerald-500/10 border-emerald-100/50').
+    - Revenue Performance card: On hover, apply a soft teal ambient shadow drop ('hover:shadow-md hover:shadow-cyan-500/10 border-cyan-100/50').
+    - Sales History card: On hover, apply a soft purple ambient shadow drop ('hover:shadow-md hover:shadow-purple-500/10 border-purple-100/50').
+- PHYSICAL PRESS FEEDBACK:
+  - Apply an active compression trigger to all three cards: 'active:scale-[0.99] active:translate-y-[0px] duration-75' so it physically feels like pressing a beautiful mechanical key switch when clicked.
