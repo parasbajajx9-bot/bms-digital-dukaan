@@ -1,0 +1,35 @@
+CRITICAL REMOVALS & STRIP-DOWN CODE INSTRUCTIONS
+
+Please perform a targeted, surgical cleanup of the codebase based on the following instructions. Do not rewrite unrelated layout elements.
+
+---
+
+1. COMPLETE AI ASSISTANT PURGE
+- LOCATE & DELETE: The main center dashboard AI widget card titled "Paras - BMS AI" completely from the dashboard/home screen file.
+- LOCATE & DELETE: The "AI ASSISTANT" section toggle from the Settings/Financial Settings view (as shown in the settings screenshot). Remove the "Enable AI Assistant" toggle switch entirely.
+- REMOVE FLOATING CHAT BUTTON: Ensure that the floating chat bubble icon widget is fully deleted from global layout files (e.g., layout.js, App.js).
+
+2. PURGE THE HINGLISH WELCOME SYSTEM
+- REWRITE SETUP INTERFACE: Look for the introductory setup modal screens ("Namaste!", "Mera naam Paras hai", "Aapki dukaan ka naam?").
+- Change ALL text to clean, premium English:
+  - Screen 1 Title: "Welcome to BMS"
+  - Screen 1 Subtitle: "Let's set up your digital storefront. Ready to get started in just 2 quick steps?"
+  - Screen 1 Button: "Get Started"
+  - Screen 2 Title: "What is your store name?"
+  - Screen 2 Subtitle: "This name will appear on all your digital customer receipts and invoices."
+
+3. REMOVE BREAK-EVEN SETTING completely
+- LOCATE & DELETE: The "Financial Settings" input field labeled "Monthly Fixed Overhead (₹) — for Break-Even Calculation" from the settings modal completely. 
+
+4. WHATSAPP BUTTON FUNCTIONALITY FIX
+- LOCATE: The green "WhatsApp" button inside the 'Receipt Preview' toolbar.
+- FIX THE LOGIC: Ensure it triggers a proper window.open() redirect string using the standard WhatsApp Web API link structure:
+  `https://api.whatsapp.com/send?phone=${customerPhone}&text=${encodedReceiptText}`
+  If the phone number is missing, fallback gracefully to opening web.whatsapp.com or prompt the user for a number, instead of failing or staying dead.
+
+5. AESTHETIC MODAL SHRINKAGE (Log Udhaar & Record Payment)
+- LOCATE: The "Record Payment" and "Log Udhaar" modal container styles.
+- COMPACT RE-DESIGN: Shrink the overall card width and padding down to make it look incredibly aesthetic and compact on mobile screens:
+  - Change main container maximum width wrapper to 'max-w-sm mx-auto p-5 rounded-[20px]'.
+  - Reduce vertical margins ('space-y-3') between input rows.
+  - Make input fields slightly shorter ('py-2 px-3 text-sm') and ensure the container fits elegantly in the center of the viewport without taking up excessive vertical screen space.

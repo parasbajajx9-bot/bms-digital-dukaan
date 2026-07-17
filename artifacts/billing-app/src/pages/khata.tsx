@@ -367,48 +367,48 @@ export default function KhataPage() {
 
       {/* Log Udhaar Modal */}
       <Dialog open={udhaarOpen} onOpenChange={setUdhaarOpen}>
-        <DialogContent className="sm:max-w-sm bg-white">
-          <DialogHeader><DialogTitle className="text-slate-800">Log Udhaar — {selectedCustomer?.name}</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-2">
+        <DialogContent className="sm:max-w-xs bg-white">
+          <DialogHeader><DialogTitle className="text-slate-800 text-base">Log Udhaar — {selectedCustomer?.name}</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-1">
             <div className="space-y-1.5">
-              <Label className="text-slate-700">Amount *</Label>
-              <Input type="number" min="0" value={udhaarAmount} onChange={(e) => setUdhaarAmount(e.target.value)} placeholder="e.g. 500" autoFocus />
+              <Label className="text-slate-700 text-sm">Amount *</Label>
+              <Input type="number" min="0" value={udhaarAmount} onChange={(e) => setUdhaarAmount(e.target.value)} placeholder="e.g. 500" autoFocus className="h-9 text-sm px-3" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-slate-700">Note / Reason</Label>
-              <Input value={udhaarNote} onChange={(e) => setUdhaarNote(e.target.value)} placeholder="e.g. Monthly grocery credit" />
+              <Label className="text-slate-700 text-sm">Note / Reason</Label>
+              <Input value={udhaarNote} onChange={(e) => setUdhaarNote(e.target.value)} placeholder="e.g. Monthly grocery credit" className="h-9 text-sm px-3" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setUdhaarOpen(false)}>Cancel</Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleLogUdhaar}>Log Udhaar</Button>
+          <DialogFooter className="mt-1">
+            <Button variant="outline" size="sm" onClick={() => setUdhaarOpen(false)}>Cancel</Button>
+            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" onClick={handleLogUdhaar}>Log Udhaar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Record Payment Modal */}
       <Dialog open={paymentOpen} onOpenChange={setPaymentOpen}>
-        <DialogContent className="sm:max-w-sm bg-white">
-          <DialogHeader><DialogTitle className="text-slate-800">Record Payment — {selectedCustomer?.name}</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-2">
+        <DialogContent className="sm:max-w-xs bg-white">
+          <DialogHeader><DialogTitle className="text-slate-800 text-base">Record Payment — {selectedCustomer?.name}</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-1">
             {selectedBalance > 0 && (
-              <div className="bg-red-50 border border-red-200/60 rounded-xl px-4 py-3">
-                <p className="text-xs text-red-500 font-semibold">Outstanding Balance</p>
-                <p className="text-xl font-extrabold text-red-600">{formatCurrency(selectedBalance, settings.currency)}</p>
+              <div className="bg-red-50 border border-red-200/60 rounded-xl px-3 py-2.5">
+                <p className="text-[11px] text-red-500 font-semibold uppercase tracking-wide">Outstanding</p>
+                <p className="text-lg font-extrabold text-red-600 leading-tight">{formatCurrency(selectedBalance, settings.currency)}</p>
               </div>
             )}
             <div className="space-y-1.5">
-              <Label className="text-slate-700">Amount Received *</Label>
-              <Input type="number" min="0" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} placeholder="e.g. 500" autoFocus />
+              <Label className="text-slate-700 text-sm">Amount Received *</Label>
+              <Input type="number" min="0" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} placeholder="e.g. 500" autoFocus className="h-9 text-sm px-3" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-slate-700">Note / Payment Mode</Label>
-              <Input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder="e.g. Paid via UPI" />
+              <Label className="text-slate-700 text-sm">Note / Payment Mode</Label>
+              <Input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder="e.g. Paid via UPI" className="h-9 text-sm px-3" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPaymentOpen(false)}>Cancel</Button>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleRecordPayment}>Record Payment</Button>
+          <DialogFooter className="mt-1">
+            <Button variant="outline" size="sm" onClick={() => setPaymentOpen(false)}>Cancel</Button>
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleRecordPayment}>Record Payment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

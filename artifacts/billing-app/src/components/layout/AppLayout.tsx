@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, FileText,
-  Menu, X, ChevronLeft, ChevronRight, HelpCircle, Bot,
+  Menu, X, ChevronLeft, ChevronRight, HelpCircle,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useShopSettings } from "@/lib/useShopSettings";
-import { AiAssistant } from "@/components/AiAssistant";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -27,7 +26,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { path: "/invoices", label: "Invoices", icon: FileText },
     { path: "/reports", label: "Reports", icon: BarChart3 },
     { path: "/khata", label: "Khata Ledger", icon: BookOpen },
-    { path: "/help", label: "Help & Support", icon: HelpCircle },
   ];
 
   const handleOpenSettings = () => {
@@ -124,6 +122,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── Bottom actions ── */}
         <div className="px-2 py-3 border-t border-slate-200/60 space-y-0.5">
+          <Link href="/help">
+            <div
+              onClick={() => setSidebarOpen(false)}
+              title={sidebarCollapsed ? "Help & Support" : undefined}
+              className={`flex items-center gap-3 py-2.5 rounded-lg w-full transition-all duration-150 cursor-pointer
+                ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}
+                ${location === "/help"
+                  ? "bg-primary/10 text-primary font-semibold border border-primary/20"
+                  : "text-slate-500 hover:bg-slate-100/80 hover:text-slate-700"}`}
+            >
+              <HelpCircle size={18} className="flex-shrink-0" />
+              <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
+                Help & Support
+              </span>
+            </div>
+          </Link>
           <button
             onClick={() => { handleOpenSettings(); setSidebarOpen(false); }}
             title={sidebarCollapsed ? "Shop Settings" : undefined}
@@ -210,53 +224,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     onChange={(e) => setForm({ ...form, gstin: e.target.value })}
                     placeholder="e.g. 22AAAAA0000A1Z5"
                   />
-                </div>
-              )}
-            </div>
-
-            {/* Financial / BEP Section */}
-            <div className="pt-2 border-t border-slate-100">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Financial Settings</p>
-              <div className="space-y-1.5">
-                <Label className="text-slate-700">Monthly Fixed Overhead (₹)
-                  <span className="text-slate-400 font-normal ml-1">— for Break-Even Calculation</span>
-                </Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={form.monthlyOverhead ?? ""}
-                  onChange={(e) => setForm({ ...form, monthlyOverhead: Number(e.target.value) || 0 })}
-                  placeholder="e.g. 15000 (Rent + Salaries + Bills)"
-                />
-                <p className="text-xs text-slate-400">Enter your monthly fixed costs (rent, electricity, salaries). This is used to calculate your Break-Even Point in Reports.</p>
-              </div>
-            </div>
-
-            {/* AI Assistant Section */}
-            <div className="pt-2 border-t border-slate-100">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">AI Assistant</p>
-              <div className="flex items-center justify-between bg-slate-50/60 border border-slate-200/50 rounded-xl px-4 py-3 mb-3">
-                <div className="flex items-center gap-2">
-                  <Bot size={16} className="text-primary" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-700">Enable AI Assistant</p>
-                    <p className="text-xs text-slate-500">Floating chat button on all pages</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={form.aiEnabled ?? true}
-                  onCheckedChange={(v) => setForm({ ...form, aiEnabled: v })}
-                />
-              </div>
-              {(form.aiEnabled ?? true) && (
-                <div className="space-y-1.5">
-                  <Label className="text-slate-700">AI Assistant Name</Label>
-                  <Input
-                    value={form.aiName ?? "Paras"}
-                    onChange={(e) => setForm({ ...form, aiName: e.target.value })}
-                    placeholder="e.g. Paras"
-                  />
-                  <p className="text-xs text-slate-400">Your AI assistant will greet you and sign messages with this name.</p>
                 </div>
               )}
             </div>
@@ -360,8 +327,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </DialogContent>
       </Dialog>
 
-      {/* ── AI Assistant (global overlay) ── */}
-      <AiAssistant />
     </div>
   );
 }

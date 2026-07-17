@@ -50,15 +50,12 @@ export function OnboardingWizard({ onComplete }: Props) {
               <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-cyan-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Sparkles size={28} className="text-primary" />
               </div>
-              <h1 className="text-xl font-extrabold text-slate-900 mb-2">Namaste! 🙏</h1>
-              <p className="text-slate-600 text-sm leading-relaxed mb-1">
-                <strong>Mera naam Paras hai.</strong>
-              </p>
+              <h1 className="text-xl font-extrabold text-slate-900 mb-2">Welcome to BMS</h1>
               <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                Aapki digital dukaan setup karne mein main aapki madad karunga. Sirf 2 kadam mein aapki dukaan tayaar ho jaayegi!
+                Let's set up your digital storefront. Ready to get started in just 2 quick steps?
               </p>
               <Button className="w-full bg-primary text-white font-semibold" onClick={() => setStep(1)}>
-                Shuru Karein <ArrowRight size={16} className="ml-2" />
+                Get Started <ArrowRight size={16} className="ml-2" />
               </Button>
             </div>
           )}
@@ -69,9 +66,9 @@ export function OnboardingWizard({ onComplete }: Props) {
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <Store size={22} className="text-primary" />
               </div>
-              <h2 className="text-lg font-extrabold text-slate-900 mb-1">Aapki dukaan ka naam?</h2>
+              <h2 className="text-lg font-extrabold text-slate-900 mb-1">What is your store name?</h2>
               <p className="text-slate-500 text-sm mb-5">
-                Yeh naam aapke receipts aur invoices par dikhega.
+                This name will appear on all your digital customer receipts and invoices.
               </p>
               <div className="space-y-2 mb-6">
                 <Label className="text-slate-700">Shop Name *</Label>
@@ -91,7 +88,7 @@ export function OnboardingWizard({ onComplete }: Props) {
                   disabled={!shopName.trim()}
                   onClick={() => setStep(2)}
                 >
-                  Aage Badhein <ArrowRight size={15} className="ml-1.5" />
+                  Continue <ArrowRight size={15} className="ml-1.5" />
                 </Button>
               </div>
             </div>
@@ -103,13 +100,13 @@ export function OnboardingWizard({ onComplete }: Props) {
               <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4">
                 <Check size={22} className="text-emerald-600" />
               </div>
-              <h2 className="text-lg font-extrabold text-slate-900 mb-1">Thoda aur jaankari…</h2>
+              <h2 className="text-lg font-extrabold text-slate-900 mb-1">Almost done!</h2>
               <p className="text-slate-500 text-sm mb-5">
-                Yeh optional hai — baad mein Settings mein bhi change kar sakte hain.
+                Optional details — you can always update these later in Settings.
               </p>
               <div className="space-y-3 mb-6">
                 <div className="space-y-1.5">
-                  <Label className="text-slate-700">Owner / Malik ka Naam</Label>
+                  <Label className="text-slate-700">Owner Name</Label>
                   <Input
                     autoFocus
                     placeholder="e.g. Rajesh Sharma"
@@ -129,12 +126,12 @@ export function OnboardingWizard({ onComplete }: Props) {
               </div>
               <div className="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-5 text-center">
                 <p className="text-sm font-semibold text-slate-800">"{shopName}"</p>
-                <p className="text-xs text-slate-500 mt-0.5">Aapki dukaan tayaar hai! 🎉</p>
+                <p className="text-xs text-slate-500 mt-0.5">Your store is ready to go! 🎉</p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>Back</Button>
                 <Button className="flex-1 bg-primary text-white font-bold" onClick={handleComplete}>
-                  Dashboard Kholo 🚀
+                  Open Dashboard 🚀
                 </Button>
               </div>
             </div>

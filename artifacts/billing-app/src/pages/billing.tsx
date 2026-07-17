@@ -202,7 +202,6 @@ export default function BillingPage() {
   const handlePrint = () => window.print();
 
   const handleWhatsApp = () => {
-    if (!customerPhone) { toast.error("Enter customer phone number to share on WhatsApp."); return; }
     const itemLines = cart.map((i) => `  ${i.name} x${i.qty} = ${formatCurrency(i.amount, settings.currency)}`).join("\n");
     const message =
       `*${settings.shopName}*\n${settings.address}\nTel: ${settings.phone}\n` +
@@ -211,7 +210,15 @@ export default function BillingPage() {
       `${itemLines}\n\nSubtotal: ${formatCurrency(subtotal, settings.currency)}\n` +
       (gstApplicable ? `CGST (${halfGst}%): ${formatCurrency(cgst, settings.currency)}\nSGST (${halfGst}%): ${formatCurrency(sgst, settings.currency)}\n` : "") +
       `*Total: ${formatCurrency(grandTotal, settings.currency)}*\n\n${settings.thankYouMessage}`;
-    window.open(`https://wa.me/91${customerPhone}?text=${encodeURIComponent(message)}`, "_blank");
+    const encodedMessage = encodeURIComponent(message);
+    if (!customerPhone) {
+      window.open(`https://web.whatsapp.com`, "_blank");
+      toast.info("No phone number set — opened WhatsApp Web. Paste the receipt there manually.");
+      return;
+    }
+    const cleanPhone = customerPhone.replace(/\D/g, "");
+    const phoneWithCC = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+    window.open(`https://api.whatsapp.com/send?phone=${phoneWithCC}&text=${encodedMessage}`, "_blank");
   };
 
   // Shared receipt JSX — used in both desktop panel and mobile modal
