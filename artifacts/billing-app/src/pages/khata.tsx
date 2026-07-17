@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Plus, Search, MessageCircle, UserPlus, TrendingUp, TrendingDown, Users, Trash2, Receipt } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Plus, Search, MessageCircle, UserPlus, TrendingUp, TrendingDown, Users, Trash2, Receipt, CheckCircle2 } from "lucide-react";
+import { fireConfetti } from "@/lib/confetti";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,9 @@ export default function KhataPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
   const [receiptBill, setReceiptBill] = useState<Bill | null>(null);
+  const [paidCelebration, setPaidCelebration] = useState(false);
+  const [paidCelebrationName, setPaidCelebrationName] = useState("");
+  const paidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const reload = () => {
     setCustomers(storage.getCustomers());
@@ -94,11 +98,19 @@ export default function KhataPage() {
     if (!selectedCustomer) return;
     const amount = Number(paymentAmount);
     if (!paymentAmount || isNaN(amount) || amount <= 0) { toast.error("Enter a valid amount."); return; }
+    const prevBalance = selectedBalance;
     storage.addTransaction({ customerId: selectedCustomer.id, type: "payment", amount, note: paymentNote.trim() || "Payment received" });
     toast.success(`${formatCurrency(amount, settings.currency)} payment recorded for ${selectedCustomer.name}.`);
     reload();
     setPaymentOpen(false);
     setPaymentAmount(""); setPaymentNote("");
+    if (prevBalance - amount <= 0) {
+      setPaidCelebrationName(selectedCustomer.name);
+      setPaidCelebration(true);
+      try { fireConfetti({ green: true, originY: 0.5 }); } catch {}
+      if (paidTimerRef.current) clearTimeout(paidTimerRef.current);
+      paidTimerRef.current = setTimeout(() => setPaidCelebration(false), 2800);
+    }
   };
 
   const handleWhatsAppReminder = () => {
@@ -431,6 +443,19 @@ export default function KhataPage() {
           {receiptBill && <MiniReceipt bill={receiptBill} currency={settings.currency} />}
         </DialogContent>
       </Dialog>
+
+      {/* ── Fully Paid Celebration Overlay ── */}
+      {paidCelebration && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none">
+          <div className="modal-spring paid-pulse-bg rounded-[32px] border-2 border-emerald-300 bg-emerald-50 px-10 py-8 shadow-2xl flex flex-col items-center gap-3">
+            <div className="paid-burst w-20 h-20 rounded-full bg-white border-2 border-emerald-400 flex items-center justify-center shadow-lg">
+              <CheckCircle2 size={40} className="text-emerald-500" />
+            </div>
+            <p className="text-2xl font-extrabold text-emerald-700">Fully Paid! 🎉</p>
+            <p className="text-sm text-emerald-600 font-medium">{paidCelebrationName}'s account is clear</p>
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );

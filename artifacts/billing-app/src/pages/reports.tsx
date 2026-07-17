@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useCountUp } from "@/hooks/useCountUp";
 import {
   Download, TrendingUp, Wallet, CreditCard, AlertCircle, BarChart2, X, Activity,
   ChevronRight, FileText, Heart,
@@ -151,6 +152,12 @@ export default function ReportsPage() {
     return acc + Math.max(0, bal);
   }, 0);
 
+  // Count-up animated values for the 4 top metric cards
+  const revCount    = useCountUp(totalRevenue, 1100);
+  const cashCount   = useCountUp(cashSales, 1100);
+  const upiCount    = useCountUp(upiSales, 1100);
+  const udhaarCount = useCountUp(directUdhaarInRange, 1100);
+
   const inventoryChartData = [...inventory]
     .sort((a, b) => b.stock - a.stock).slice(0, 12)
     .map(item => ({ name: item.name.length > 14 ? item.name.slice(0, 13) + "…" : item.name, stock: item.stock, lowAlert: item.lowStockThreshold }));
@@ -296,23 +303,18 @@ export default function ReportsPage() {
         </select>
       </div>
 
-      {/* Top 4 metric cards */}
+      {/* Top 4 metric cards — count-up animated */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
         {[
-          { label: "Net Revenue",     value: formatCurrency(totalRevenue, settings.currency), sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`, color: "text-primary",    Icon: TrendingUp,   bg: "bg-primary/8"  },
-          { label: "Cash Sales",      value: formatCurrency(cashSales,    settings.currency), sub: `${filtered.filter(b => b.paymentMethod === "cash").length} bills`,                        color: "text-green-700",  Icon: Wallet,      bg: "bg-green-50" },
-          { label: "UPI / Card",      value: formatCurrency(upiSales,     settings.currency), sub: `${filtered.filter(b => ["upi","card"].includes(b.paymentMethod)).length} bills`,          color: "text-blue-700",   Icon: CreditCard,  bg: "bg-blue-50"  },
-          {
-            label: "Credit (Udhaar)",
-            value: formatCurrency(directUdhaarInRange, settings.currency),
-            sub: `${rangedTxns.filter(t => t.type === "udhaar").length} entries · Khata+Billing`,
-            color: "text-red-600", Icon: AlertCircle, bg: "bg-red-50",
-          },
+          { label: "Net Revenue",    value: formatCurrency(Math.round(revCount),    settings.currency), sub: `${filtered.length} bill${filtered.length !== 1 ? "s" : ""}`,                          color: "text-primary",       Icon: TrendingUp,  bg: "bg-primary/8"  },
+          { label: "Cash Sales",     value: formatCurrency(Math.round(cashCount),   settings.currency), sub: `${filtered.filter(b => b.paymentMethod === "cash").length} bills`,                       color: "text-green-700",     Icon: Wallet,      bg: "bg-green-50"  },
+          { label: "UPI / Card",     value: formatCurrency(Math.round(upiCount),    settings.currency), sub: `${filtered.filter(b => ["upi","card"].includes(b.paymentMethod)).length} bills`,         color: "text-blue-700",      Icon: CreditCard,  bg: "bg-blue-50"   },
+          { label: "Credit (Udhaar)",value: formatCurrency(Math.round(udhaarCount), settings.currency), sub: `${rangedTxns.filter(t => t.type === "udhaar").length} entries · Khata+Billing`,         color: "text-red-600",       Icon: AlertCircle, bg: "bg-red-50"    },
         ].map(card => (
-          <div key={card.label} className="glass-panel p-3 md:p-5">
+          <div key={card.label} className="glass-panel card-interactive p-3 md:p-5">
             <div className={`inline-flex p-1.5 md:p-2 rounded-lg ${card.bg} mb-2 md:mb-3`}><card.Icon size={15} className={card.color} /></div>
             <p className="text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide">{card.label}</p>
-            <p className={`text-base md:text-2xl font-extrabold mt-0.5 md:mt-1 leading-tight ${card.color}`}>{card.value}</p>
+            <p className={`count-reveal text-base md:text-2xl font-extrabold mt-0.5 md:mt-1 leading-tight tabular-nums ${card.color}`}>{card.value}</p>
             <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{card.sub}</p>
           </div>
         ))}
@@ -368,7 +370,7 @@ export default function ReportsPage() {
       {/* ── MODAL: Financial Health ──────────────────────────────────────── */}
       {healthOpen && (
         <ModalWrap onClose={() => setHealthOpen(false)}>
-          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
+          <div className="modal-spring bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
@@ -396,7 +398,7 @@ export default function ReportsPage() {
       {/* ── MODAL: Revenue Performance ──────────────────────────────────── */}
       {revenueOpen && (
         <ModalWrap onClose={() => setRevenueOpen(false)}>
-          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+          <div className="modal-spring bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -424,7 +426,7 @@ export default function ReportsPage() {
       {/* ── MODAL: Sales History ─────────────────────────────────────────── */}
       {salesOpen && (
         <ModalWrap onClose={() => setSalesOpen(false)}>
-          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+          <div className="modal-spring bg-white rounded-[24px] shadow-2xl w-full max-w-[95vw] md:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center">
@@ -475,7 +477,7 @@ export default function ReportsPage() {
       {/* ── MODAL: Graph Analytics ────────────────────────────────────────── */}
       {analyticsOpen && (
         <ModalWrap onClose={() => setAnalyticsOpen(false)}>
-          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[92vw] md:max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+          <div className="modal-spring bg-white rounded-[24px] shadow-2xl w-full max-w-[92vw] md:max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
             <div className="flex items-start justify-between px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">

@@ -176,6 +176,99 @@
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
 }
 
+/* ═══════════════════════════════════════════════════════
+   JUICE UPDATE — Spring animations, micro-interactions
+   ═══════════════════════════════════════════════════════ */
+
+/* Spring lift on primary buttons */
+.btn-spring {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.2s ease;
+}
+.btn-spring:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 6px 18px rgba(14, 165, 233, 0.32));
+}
+.btn-spring:active:not(:disabled) {
+  transform: scale(0.95) !important;
+  transition-duration: 80ms;
+  filter: none;
+}
+
+/* Interactive card zoom */
+.card-interactive {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+  cursor: default;
+}
+.card-interactive:hover {
+  transform: scale(1.015);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+  border-color: rgba(14, 165, 233, 0.22);
+}
+
+/* Modal spring-in */
+@keyframes modal-spring-in {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0);       }
+}
+.modal-spring {
+  animation: modal-spring-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Shimmer sweep (active badges, pills, status indicators) */
+@keyframes shimmer-pass {
+  0%   { transform: translateX(-200%); }
+  100% { transform: translateX(300%);  }
+}
+.shimmer-badge {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.7) 50%, transparent 80%);
+  animation: shimmer-pass 3s ease-in-out infinite 2s;
+}
+
+/* Paid-in-full burst */
+@keyframes paid-burst {
+  0%   { transform: scale(0.3); opacity: 0; }
+  55%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.paid-burst { animation: paid-burst 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes paid-pulse-bg {
+  0%, 100% { background-color: rgba(16, 185, 129, 0.07); }
+  50%       { background-color: rgba(16, 185, 129, 0.18); }
+}
+.paid-pulse-bg { animation: paid-pulse-bg 0.9s ease-in-out 3; }
+
+/* Count-up reveal */
+@keyframes count-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+.count-reveal { animation: count-fade-in 0.38s ease-out both; }
+
+/* Pulse ring on empty-state CTA */
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(14, 165, 233, 0.38); }
+  50%       { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0);   }
+}
+.pulse-cta { animation: pulse-ring 2.2s ease-in-out infinite; }
+
+/* Gentle float for empty-state icons */
+@keyframes float-idle {
+  0%, 100% { transform: translateY(0);   }
+  50%       { transform: translateY(-6px); }
+}
+.float-icon { animation: float-idle 3s ease-in-out infinite; }
+
 @media print {
   body {
     background: white !important;

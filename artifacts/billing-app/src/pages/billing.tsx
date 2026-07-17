@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Plus, Printer, Share2, X, Percent, IndianRupee, Eye, Search } from "lucide-react";
+import { Plus, Printer, Share2, X, Percent, IndianRupee, Eye, Search, ShoppingCart } from "lucide-react";
+import { fireConfetti } from "@/lib/confetti";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,6 +193,7 @@ export default function BillingPage() {
       toast.success(`${bill.billNumber} finalised successfully.`);
     }
 
+    try { fireConfetti(); } catch {}
     setCart([]); setCustomerName(""); setCustomerPhone("");
     setGstEnabled(false); setPaymentMethod("cash");
     setPreviewInvoiceNo(storage.peekNextInvoiceNumber());
@@ -264,7 +266,19 @@ export default function BillingPage() {
         </thead>
         <tbody>
           {cart.length === 0 ? (
-            <tr><td colSpan={7} className="py-10 text-center text-slate-400 text-sm">No items added yet</td></tr>
+            <tr>
+              <td colSpan={7} className="py-12 text-center">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="float-icon w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
+                    <ShoppingCart size={24} className="text-slate-300" />
+                  </div>
+                  <div>
+                    <p className="text-slate-500 font-semibold text-sm">Bill is empty</p>
+                    <p className="text-slate-400 text-xs mt-0.5">Search and add items from the left panel</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
           ) : (
             cart.map((item, i) => (
               <tr key={i} className="border-b border-slate-200">
