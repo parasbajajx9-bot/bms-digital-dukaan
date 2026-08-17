@@ -1,0 +1,52 @@
+MASTER APPS & UI/UX REFINEMENT DIRECTIVE
+
+Please perform a targeted execution of the following fixes, UI enhancements, and empty-state workflow improvements across the application. Ensure all previous removal directives (AI Assistant purge, Break-Even removal, Hinglish conversion to English) remain strictly enforced.
+
+---
+
+1. INLINE INVENTORY QUICK-ADD FLOW (EMPTY STATE ENHANCEMENT)
+- LOCATE: The empty inventory container in the Billing Terminal displaying "No inventory yet — add products in Inventory first".
+- RESTRUCTURE UI: Convert this block into a clean, interactive call-to-action card:
+  - Header: "No inventory items found"
+  - Action Button: Add a styled button labeled "+ Quick Add Product" inside the container:
+    'mt-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer'.
+- MODAL TRIGGER: Clicking "+ Quick Add Product" opens the compact Add Product modal directly within the Billing view without navigating away.
+- AUTO-SELECT: Upon saving the new item, refresh the item list immediately and auto-select the newly created item into the active bill.
+
+---
+
+2. FORMAL PDF / PRINT LAYOUT CLEANUP
+- LOCATE: The Receipt Preview and Print styling rules.
+- PRINT CSS (@media print):
+  - Completely hide all UI control buttons, top header toolbars (WhatsApp, Print, Close X buttons), and overlay backgrounds during print generation (using '.no-print' utilities).
+  - Force the printable receipt container to fill 100% of the page width and remove top margins/whitespace so the document appears clean, centered, and formal on paper/PDF exports.
+
+---
+
+3. DIRECT NATIVE WHATSAPP DEEP-LINKING
+- LOCATE: The WhatsApp action button handler.
+- LINK PROTOCOL UPDATE:
+  - Update the URL scheme to trigger the mobile native app directly using:
+    `whatsapp://send?phone=${cleanPhoneNumber}&text=${encodedMessage}`
+  - Fallback: If opening the native URL scheme fails (e.g., on standard desktop browsers), fallback gracefully to `https://wa.me/...`.
+
+---
+
+4. EXPORT CSV DOWNLOAD FIX
+- LOCATE: The "Export CSV" handler in Reports & Bookkeeping.
+- FIX DOWNLOAD TRIGGER: Build the CSV download using explicit MIME blobs to ensure support across mobile web browsers:
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `sales_report_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+---
+
+5. COMPACT MODALS & TACTILE HOVER FEEDBACK
+- SHRINK MODALS: Ensure "Log Udhaar" and "Record Payment" modals remain compact ('max-w-sm mx-auto p-5 rounded-[20px]').
+- TACTILE BUTTONS: Apply active compression ('active:scale-95 duration-100') to all primary action buttons, and add subtle ambient colored drop-shadow glows on hover to dashboard cards ("Financial Health", "Revenue Performance", "Sales History").
