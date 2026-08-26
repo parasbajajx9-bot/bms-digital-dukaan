@@ -19,6 +19,67 @@ const emptyForm: ProductForm = {
   sellingPrice: "", costPrice: "", stock: "", lowStockThreshold: "5",
 };
 
+function CategoryField({
+  categories,
+  mode,
+  value,
+  onModeChange,
+  onChange,
+}: {
+  categories: string[];
+  mode: "existing" | "new";
+  value: string;
+  onModeChange: (mode: "existing" | "new") => void;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-slate-700">Category</Label>
+        {categories.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              const nextMode = mode === "new" ? "existing" : "new";
+              onModeChange(nextMode);
+              if (nextMode === "new") onChange("");
+            }}
+            className="text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
+          >
+            {mode === "new" ? "Use saved category" : "Create new"}
+          </button>
+        )}
+      </div>
+      {mode === "existing" && categories.length > 0 ? (
+        <select
+          value={value}
+          onChange={(e) => {
+            if (e.target.value === "__new__") {
+              onModeChange("new");
+              onChange("");
+            } else {
+              onChange(e.target.value);
+            }
+          }}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        >
+          <option value="">Choose a saved category</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+          <option value="__new__">+ Create new category</option>
+        </select>
+      ) : (
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="e.g. Grains"
+        />
+      )}
+    </>
+  );
+}
+
 export default function InventoryPage() {
   const { settings, saveSettings } = useShopSettings();
 
@@ -34,6 +95,7 @@ export default function InventoryPage() {
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [categoryMode, setCategoryMode] = useState<"existing" | "new">("new");
   const [formErrors, setFormErrors] = useState<Partial<ProductForm>>({});
   const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
 
@@ -70,13 +132,20 @@ export default function InventoryPage() {
     reload();
   };
 
-  const openAddModal = () => { setForm(emptyForm); setFormErrors({}); setEditingId(null); setModalMode("add"); };
+  const openAddModal = () => {
+    setForm(emptyForm);
+    setCategoryMode(categories.length > 0 ? "existing" : "new");
+    setFormErrors({});
+    setEditingId(null);
+    setModalMode("add");
+  };
   const openEditModal = (item: InventoryItem) => {
     setForm({
       name: item.name, sku: item.sku, hsnCode: item.hsnCode ?? "", category: item.category,
       sellingPrice: String(item.sellingPrice), costPrice: String(item.costPrice),
       stock: String(item.stock), lowStockThreshold: String(item.lowStockThreshold),
     });
+    setCategoryMode("new");
     setFormErrors({}); setEditingId(item.id); setModalMode("edit");
   };
 
@@ -349,16 +418,32 @@ export default function InventoryPage() {
               </div>
             ) : (
               <div className="space-y-1.5">
-                <Label className="text-slate-700">Category</Label>
-                <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Grains" />
+                <CategoryField
+                  categories={categories}
+                  mode={modalMode === "add" ? categoryMode : "new"}
+                  value={form.category}
+                  onModeChange={(mode) => {
+                    setCategoryMode(mode);
+                    if (mode === "new") setForm({ ...form, category: "" });
+                  }}
+                  onChange={(category) => setForm({ ...form, category })}
+                />
               </div>
             )}
 
             {/* Category — shown in second slot when GST is on */}
             {settings.globalGstEnabled && (
               <div className="space-y-1.5">
-                <Label className="text-slate-700">Category</Label>
-                <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Grains" />
+                <CategoryField
+                  categories={categories}
+                  mode={modalMode === "add" ? categoryMode : "new"}
+                  value={form.category}
+                  onModeChange={(mode) => {
+                    setCategoryMode(mode);
+                    if (mode === "new") setForm({ ...form, category: "" });
+                  }}
+                  onChange={(category) => setForm({ ...form, category })}
+                />
               </div>
             )}
 

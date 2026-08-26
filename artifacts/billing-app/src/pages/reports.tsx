@@ -135,9 +135,6 @@ export default function ReportsPage() {
     }, 0), 0);
   const grossProfit = totalRevenue - totalCost;
   const marginPct   = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
-  const overhead    = settings.monthlyOverhead ?? 0;
-  const bep         = overhead > 0 && marginPct > 0 ? overhead / (marginPct / 100) : null;
-
   // Outstanding Udhaar — uses Khata transactions (range-filtered) so direct entries are included
   const rangedTxns = startDate
     ? transactions.filter(t => new Date(t.date) >= startDate)
@@ -200,12 +197,6 @@ export default function ReportsPage() {
         { label: "Total Cost", value: formatCurrency(totalCost, settings.currency), color: "text-orange-600", bg: "bg-orange-50", note: "Wholesale cost" },
         { label: "Gross Profit", value: formatCurrency(grossProfit, settings.currency), color: grossProfit >= 0 ? "text-emerald-600" : "text-red-500", bg: grossProfit >= 0 ? "bg-emerald-50" : "bg-red-50", note: grossProfit >= 0 ? "Net addition" : "Net loss" },
         { label: "Profit Margin", value: `${marginPct.toFixed(1)}%`, color: marginPct >= 20 ? "text-emerald-600" : marginPct >= 10 ? "text-amber-600" : "text-red-500", bg: "bg-slate-50", note: "Avg margin" },
-        {
-          label: "Break-Even Point",
-          value: bep ? formatCurrency(bep, settings.currency) : overhead ? "Calc…" : "Set overhead",
-          color: "text-violet-600", bg: "bg-violet-50",
-          note: bep ? "Monthly target" : overhead ? "Need sales data" : "Shop Settings ↗",
-        },
         {
           label: "Outstanding Udhaar",
           value: formatCurrency(outstandingUdhaar, settings.currency),
@@ -323,7 +314,7 @@ export default function ReportsPage() {
       {/* ── 3 Quick-View Action Cards ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-shrink-0">
         {[
-          { label: "Financial Health",    sub: "Profit · Cost · BEP · Udhaar",    Icon: Heart,     color: "text-emerald-600", bg: "bg-emerald-50",  onClick: () => setHealthOpen(true),  glow: "hover:shadow-emerald-500/10 hover:border-emerald-100/50" },
+          { label: "Financial Health",    sub: "Profit · Cost · Udhaar",          Icon: Heart,     color: "text-emerald-600", bg: "bg-emerald-50",  onClick: () => setHealthOpen(true),  glow: "hover:shadow-emerald-500/10 hover:border-emerald-100/50" },
           { label: "Revenue Performance", sub: `Daily trends · ${rangeLabels[range]}`, Icon: BarChart2, color: "text-primary",     bg: "bg-primary/8",   onClick: () => setRevenueOpen(true), glow: "hover:shadow-cyan-500/10 hover:border-cyan-100/50"     },
           { label: "Sales History",       sub: `${filtered.length} transactions`,  Icon: FileText,  color: "text-violet-600",  bg: "bg-violet-50",   onClick: () => setSalesOpen(true),   glow: "hover:shadow-purple-500/10 hover:border-purple-100/50" },
         ].map(card => (
@@ -378,7 +369,7 @@ export default function ReportsPage() {
                 </div>
                 <div>
                   <h2 className="text-sm font-extrabold text-slate-800">Financial Health</h2>
-                  <p className="text-xs text-slate-400">Revenue · Cost · Profit · BEP · {rangeLabels[range]}</p>
+                   <p className="text-xs text-slate-400">Revenue · Cost · Profit · Udhaar · {rangeLabels[range]}</p>
                 </div>
               </div>
               <button onClick={() => setHealthOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 transition-colors">
@@ -386,9 +377,6 @@ export default function ReportsPage() {
               </button>
             </div>
             <div className="overflow-auto p-4 md:p-5">
-              {!overhead && (
-                <p className="text-xs text-slate-400 italic mb-4">Set monthly overhead in Shop Settings to enable BEP calculation ↗</p>
-              )}
               <FinancialHealthCards />
             </div>
           </div>

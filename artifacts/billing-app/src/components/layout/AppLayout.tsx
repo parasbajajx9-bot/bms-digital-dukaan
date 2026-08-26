@@ -308,7 +308,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
           <div className="px-5 mt-4">
             <a
-              href="https://www.linkedin.com/in/paras-bajaj-752174314"
+              href="https://www.linkedin.com/in/paras-bajaj-"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 w-full justify-center px-4 py-2.5 rounded-xl border border-[#0A66C2]/30 bg-[#0A66C2]/5 text-[#0A66C2] hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 text-sm font-semibold transition-all duration-150"
