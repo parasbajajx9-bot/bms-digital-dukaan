@@ -1,5 +1,4 @@
 kind = "web"
-videoAspectRatio = "16:9"
 previewPath = "/"
 title = "BMS - Digital Dukaan"
 version = "1.0.0"
