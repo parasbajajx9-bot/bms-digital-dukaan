@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Yr0hqwoqYoUl7X-Eezx9X"
+uri = "file://artifacts/billing-app/public/bms-product-demo.mp4"
+type = "video"
+title = "BMS 30-second app demo"
+description = "A 30-second 16:9 BMS product demo with GST billing, Udhaar Khata, inventory, profit, and CTA scenes. The Help & Support page includes a download link and live dashboard iframe preview."
+logical_id = "ec4852a3-0db9-4e7b-9c30-65420a6ad4f4"
+content_hash = "sha256:60facd18e3d3852f12121bf03644ca8f234ae4bca1194e85767c803124d411bf"
+size = 183431
+mtime_ms = 1789182673971
+storage_uri = "gcs://replit-rams-assets-pike/rams/assets/repl:f6e72760-0fb9-4b4d-97f7-209bc50cad3e/ec4852a3-0db9-4e7b-9c30-65420a6ad4f4/b7110a22-47ee-43b1-9f9a-95b718257a66"
+storage_version_token = "1789474171251909"
+content_type = "video/mp4"
