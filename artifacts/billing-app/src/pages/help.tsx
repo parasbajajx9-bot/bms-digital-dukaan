@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Calculator, PackageSearch, FileText, BarChart3, BookOpen, Settings,
-  Mail, HelpCircle,
+  Mail, HelpCircle, Download, Clock3, CircleCheck,
 } from "lucide-react";
 
 type Lang = "en" | "hi" | "hl";
@@ -115,6 +115,43 @@ export default function HelpPage() {
           ))}
         </div>
       </div>
+
+      {/* Product demo */}
+      <section className="help-demo-panel" aria-labelledby="demo-title">
+        <div className="help-demo-heading">
+          <div>
+            <div className="help-demo-kicker"><span className="help-demo-dot" /> See BMS in motion</div>
+            <h2 id="demo-title">A faster day at the counter.</h2>
+            <p>A 30-second tour of the tools that keep your shop moving. The framed screens are ready for your own dashboard recordings.</p>
+          </div>
+          <a
+            href={`${import.meta.env.BASE_URL}bms-product-demo.mp4`}
+            download="bms-product-demo.mp4"
+            className="help-download-link"
+          >
+            <Download size={15} />
+            Download video
+          </a>
+        </div>
+        <iframe
+          src={`${import.meta.env.BASE_URL}`}
+          title="Live BMS dashboard preview"
+          style={{
+            width: "100%",
+            height: "350px",
+            border: "none",
+            overflow: "hidden",
+            display: "block",
+          }}
+          scrolling="no"
+        />
+        <div className="help-demo-meta">
+          <span><CircleCheck size={14} /> Auto-plays and loops</span>
+          <span><Clock3 size={14} /> 30 seconds</span>
+          <span>16:9 landscape</span>
+          <span className="help-demo-note">Recording placeholders are labeled in-frame</span>
+        </div>
+      </section>
 
       {/* Feature cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
