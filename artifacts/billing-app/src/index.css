@@ -176,64 +176,6 @@
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
 }
 
-.help-demo-panel {
-  position: relative;
-  overflow: hidden;
-  padding: 1.1rem;
-  border: 1px solid rgba(23, 59, 67, 0.12);
-  border-radius: 1.2rem;
-  background: linear-gradient(145deg, rgba(255, 251, 243, 0.92), rgba(237, 230, 216, 0.72));
-  box-shadow: 0 12px 35px rgba(23, 59, 67, 0.08);
-}
-.help-demo-panel::after {
-  content: "";
-  position: absolute;
-  top: -50px;
-  right: -45px;
-  width: 140px;
-  height: 140px;
-  border: 1px solid rgba(232, 103, 77, 0.18);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.help-demo-heading {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0.25rem 0 1rem;
-}
-.help-demo-kicker {
-  display: flex;
-  align-items: center;
-  gap: 0.42rem;
-  color: #b64e39;
-  font: 800 0.66rem/1.2 "Space Grotesk", sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.help-demo-dot {
-  width: 0.42rem;
-  height: 0.42rem;
-  border-radius: 0.15rem;
-  background: #e8674d;
-  transform: rotate(45deg);
-}
-.help-demo-heading h2 {
-  margin: 0.36rem 0 0.3rem;
-  color: #173b43;
-  font: 800 clamp(1.25rem, 3vw, 1.8rem)/1 "Space Grotesk", sans-serif;
-  letter-spacing: -0.06em;
-}
-.help-demo-heading p {
-  max-width: 35rem;
-  margin: 0;
-  color: #607176;
-  font-size: 0.75rem;
-  line-height: 1.55;
-}
 /* ═══════════════════════════════════════════════════════
    JUICE UPDATE — Spring animations, micro-interactions
    ═══════════════════════════════════════════════════════ */
@@ -347,6 +289,4 @@
 }
 
 @media (max-width: 640px) {
-  .help-demo-panel { padding: 0.75rem; }
-  .help-demo-heading { display: block; }
 }

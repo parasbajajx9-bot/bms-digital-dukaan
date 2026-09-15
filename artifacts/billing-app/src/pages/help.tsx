@@ -116,27 +116,6 @@ export default function HelpPage() {
         </div>
       </div>
 
-      {/* Product demo */}
-      <section className="help-demo-panel" aria-labelledby="demo-title">
-        <div className="help-demo-heading">
-          <div>
-            <div className="help-demo-kicker"><span className="help-demo-dot" /> See BMS in motion</div>
-            <h2 id="demo-title">A faster day at the counter.</h2>
-            <p>Explore the live BMS app interface directly inside this preview.</p>
-          </div>
-        </div>
-        <iframe
-          src="/"
-          style={{
-            width: "100%",
-            height: "400px",
-            border: "none",
-            borderRadius: "8px",
-          }}
-          title="BMS App Preview"
-        />
-      </section>
-
       {/* Feature cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {c.features.map((feat) => {
