@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { storage, ShopSettings } from './storage';
+import { storage, ShopSettings } from './storage.js';
 
 export const SETTINGS_UPDATED_EVENT = 'shop-settings-updated';
 
