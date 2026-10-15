@@ -1,8 +1,8 @@
 import { Router, type IRouter } from "express";
-import healthRouter from "./health.js";
+import shopDataRouter from "./shop-data.js";
 
 const router: IRouter = Router();
 
-router.use(healthRouter);
+router.use(shopDataRouter);
 
 export default router;

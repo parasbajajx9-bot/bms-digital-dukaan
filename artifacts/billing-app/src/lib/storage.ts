@@ -80,6 +80,15 @@ export type Bill = {
   createdAt: string;
 };
 
+export type ShopDataSnapshot = {
+  settings: ShopSettings;
+  inventory: InventoryItem[];
+  customers: Customer[];
+  transactions: Transaction[];
+  bills: Bill[];
+  invoiceCounter: number;
+};
+
 const DEFAULT_SETTINGS: ShopSettings = {
   shopName: "",
   ownerName: "",
@@ -99,6 +108,13 @@ const DEFAULT_SETTINGS: ShopSettings = {
 
 // v3: Clean slate — no seed data, shop starts fresh with onboarding wizard
 const STORAGE_VERSION = "v3";
+export const SHOP_DATA_CHANGED_EVENT = "bms-shop-data-changed";
+
+function notifyShopDataChanged() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(SHOP_DATA_CHANGED_EVENT));
+  }
+}
 
 function initializeStorage() {
   const currentVersion = localStorage.getItem('billing_version');
@@ -144,10 +160,16 @@ export const storage = {
     const stored = JSON.parse(localStorage.getItem('billing_shopSettings') || '{}');
     return { ...DEFAULT_SETTINGS, ...stored };
   },
-  saveSettings: (settings: ShopSettings) => localStorage.setItem('billing_shopSettings', JSON.stringify(settings)),
+  saveSettings: (settings: ShopSettings) => {
+    localStorage.setItem('billing_shopSettings', JSON.stringify(settings));
+    notifyShopDataChanged();
+  },
 
   getInventory: (): InventoryItem[] => JSON.parse(localStorage.getItem('billing_inventory') || '[]'),
-  saveInventory: (items: InventoryItem[]) => localStorage.setItem('billing_inventory', JSON.stringify(items)),
+  saveInventory: (items: InventoryItem[]) => {
+    localStorage.setItem('billing_inventory', JSON.stringify(items));
+    notifyShopDataChanged();
+  },
   addInventoryItem: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => {
     const items = storage.getInventory();
     items.push({ ...item, id: crypto.randomUUID(), createdAt: new Date().toISOString() });
@@ -175,7 +197,10 @@ export const storage = {
   },
 
   getCustomers: (): Customer[] => JSON.parse(localStorage.getItem('billing_customers') || '[]'),
-  saveCustomers: (customers: Customer[]) => localStorage.setItem('billing_customers', JSON.stringify(customers)),
+  saveCustomers: (customers: Customer[]) => {
+    localStorage.setItem('billing_customers', JSON.stringify(customers));
+    notifyShopDataChanged();
+  },
   addCustomer: (customer: Omit<Customer, 'id' | 'createdAt'>) => {
     const customers = storage.getCustomers();
     const newCustomer = { ...customer, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
@@ -192,7 +217,10 @@ export const storage = {
   },
 
   getTransactions: (): Transaction[] => JSON.parse(localStorage.getItem('billing_transactions') || '[]'),
-  saveTransactions: (txns: Transaction[]) => localStorage.setItem('billing_transactions', JSON.stringify(txns)),
+  saveTransactions: (txns: Transaction[]) => {
+    localStorage.setItem('billing_transactions', JSON.stringify(txns));
+    notifyShopDataChanged();
+  },
   addTransaction: (txn: Omit<Transaction, 'id' | 'date'>) => {
     const txns = storage.getTransactions();
     const newTxn = { ...txn, id: crypto.randomUUID(), date: new Date().toISOString() };
@@ -202,7 +230,10 @@ export const storage = {
   },
 
   getBills: (): Bill[] => JSON.parse(localStorage.getItem('billing_bills') || '[]'),
-  saveBills: (bills: Bill[]) => localStorage.setItem('billing_bills', JSON.stringify(bills)),
+  saveBills: (bills: Bill[]) => {
+    localStorage.setItem('billing_bills', JSON.stringify(bills));
+    notifyShopDataChanged();
+  },
 
   cancelBill: (id: string) => {
     const bills = storage.getBills();
@@ -238,6 +269,7 @@ export const storage = {
     const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
     const next = counter + 1;
     localStorage.setItem('billing_invoice_counter', String(next));
+    notifyShopDataChanged();
     return `INV-${String(next).padStart(4, '0')}`;
   },
 
@@ -245,4 +277,33 @@ export const storage = {
     const counter = parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10);
     return `INV-${String(counter + 1).padStart(4, '0')}`;
   },
+
+  getSnapshot: (): ShopDataSnapshot => ({
+    settings: storage.getSettings(),
+    inventory: storage.getInventory(),
+    customers: storage.getCustomers(),
+    transactions: storage.getTransactions(),
+    bills: storage.getBills(),
+    invoiceCounter: parseInt(localStorage.getItem('billing_invoice_counter') || '100', 10),
+  }),
+
+  restoreSnapshot: (snapshot: ShopDataSnapshot, notify = true) => {
+    localStorage.setItem('billing_shopSettings', JSON.stringify(snapshot.settings));
+    localStorage.setItem('billing_inventory', JSON.stringify(snapshot.inventory));
+    localStorage.setItem('billing_customers', JSON.stringify(snapshot.customers));
+    localStorage.setItem('billing_transactions', JSON.stringify(snapshot.transactions));
+    localStorage.setItem('billing_bills', JSON.stringify(snapshot.bills));
+    localStorage.setItem('billing_invoice_counter', String(snapshot.invoiceCounter));
+    localStorage.setItem('billing_version', STORAGE_VERSION);
+    if (notify) notifyShopDataChanged();
+  },
 };
+
+export function hasShopData(snapshot: ShopDataSnapshot): boolean {
+  return Boolean(snapshot.settings.shopName?.trim()) ||
+    snapshot.inventory.length > 0 ||
+    snapshot.customers.length > 0 ||
+    snapshot.transactions.length > 0 ||
+    snapshot.bills.length > 0 ||
+    snapshot.invoiceCounter > 100;
+}

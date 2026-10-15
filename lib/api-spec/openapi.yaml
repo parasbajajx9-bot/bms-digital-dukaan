@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: shop-data
+    description: Signed-in shop backup and synchronization
 paths:
   /healthz:
     get:
@@ -24,6 +26,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /shop-data:
+    get:
+      operationId: getShopData
+      tags: [shop-data]
+      summary: Get the signed-in owner's shop data
+      responses:
+        "200":
+          description: Current cloud copy or an empty snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopDataResponse"
+        "401":
+          description: Sign-in required
+        "503":
+          description: Database unavailable
+    put:
+      operationId: saveShopData
+      tags: [shop-data]
+      summary: Save the signed-in owner's complete shop snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShopDataInput"
+      responses:
+        "200":
+          description: Saved shop snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShopDataResponse"
+        "400":
+          description: Invalid shop snapshot
+        "401":
+          description: Sign-in required
+        "503":
+          description: Database unavailable
 components:
   schemas:
     HealthStatus:
@@ -33,4 +74,50 @@ components:
           type: string
       required:
         - status
+    ShopDataInput:
+      type: object
+      required:
+        - settings
+        - inventory
+        - customers
+        - transactions
+        - bills
+        - invoiceCounter
+      properties:
+        settings:
+          type: object
+          additionalProperties: true
+        inventory:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        customers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        transactions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        bills:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        invoiceCounter:
+          type: integer
+          minimum: 0
+    ShopDataResponse:
+      type: object
+      required:
+        - hasCloudData
+        - data
+      properties:
+        hasCloudData:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/ShopDataInput"
 
