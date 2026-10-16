@@ -4,16 +4,15 @@ import * as schema from "./schema/index.js";
 
 const { Pool } = pg;
 
-const databaseUrl =
-  process.env.DATABASE_URL ?? "postgresql://localhost:5432/bms";
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!process.env.DATABASE_URL) {
+if (!databaseUrl) {
   console.warn(
-    "DATABASE_URL is not set; using the local fallback database URL.",
+    "DATABASE_URL is not set; database-backed routes will be unavailable.",
   );
 }
 
-export const pool = new Pool({ connectionString: databaseUrl });
+export const pool = new Pool(databaseUrl ? { connectionString: databaseUrl } : {});
 export const db = drizzle(pool, { schema });
 
 export * from "./schema/index.js";

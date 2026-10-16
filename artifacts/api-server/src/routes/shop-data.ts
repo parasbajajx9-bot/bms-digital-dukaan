@@ -36,6 +36,10 @@ export function createShopDataRouter(
   router.get("/shop-data", async (req, res): Promise<void> => {
     const ownerId = ownerIdFromRequest(req, res);
     if (!ownerId) return;
+    if (!process.env.DATABASE_URL) {
+      res.status(503).json({ error: "Cloud storage is not configured for this deployment." });
+      return;
+    }
 
     try {
       const [record] = await db
@@ -58,6 +62,10 @@ export function createShopDataRouter(
   router.put("/shop-data", async (req, res): Promise<void> => {
     const ownerId = ownerIdFromRequest(req, res);
     if (!ownerId) return;
+    if (!process.env.DATABASE_URL) {
+      res.status(503).json({ error: "Cloud storage is not configured for this deployment." });
+      return;
+    }
 
     const parsed = SaveShopDataBody.safeParse(req.body);
     if (!parsed.success) {
