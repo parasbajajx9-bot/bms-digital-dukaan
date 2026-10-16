@@ -54,6 +54,7 @@ export function CloudDataBoundary({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>({ kind: "loading" });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("saved");
   const [backupDownloaded, setBackupDownloaded] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !userId) return;
@@ -96,18 +97,23 @@ export function CloudDataBoundary({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, isSignedIn, userId]);
+  }, [isLoaded, isSignedIn, userId, retryCount]);
 
   useEffect(() => {
     if (phase.kind !== "ready" || !userId) return;
     let timer: number | undefined;
     let inFlight = false;
+    let pending = false;
 
     const sync = () => {
+      if (inFlight) {
+        pending = true;
+        return;
+      }
       if (timer !== undefined) window.clearTimeout(timer);
       timer = window.setTimeout(async () => {
-        if (inFlight) return;
         inFlight = true;
+        pending = false;
         setSyncStatus("saving");
         try {
           await saveCloudShopData(storage.getSnapshot());
@@ -116,6 +122,7 @@ export function CloudDataBoundary({ children }: { children: ReactNode }) {
           setSyncStatus("offline");
         } finally {
           inFlight = false;
+          if (pending) sync();
         }
       }, 650);
     };
@@ -144,7 +151,7 @@ export function CloudDataBoundary({ children }: { children: ReactNode }) {
         <p className="mt-2">Your browser copy has not been replaced. Check your connection and try again.</p>
         <button
           className="mt-5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white"
-          onClick={() => setPhase({ kind: "loading" })}
+          onClick={() => setRetryCount((count) => count + 1)}
         >
           Try again
         </button>

@@ -21,7 +21,7 @@ const content = {
     faq: [
       { q: "How do I add a new product?",      a: "Go to Inventory → click the '+' button at the top right → fill in the product details and save." },
       { q: "How does stock get deducted?",     a: "When you finalize a bill, stock is automatically deducted for each item that has a matching inventory entry." },
-      { q: "Can I use this offline?",          a: "Yes! All data is saved locally on your device. The app works fully offline once loaded. You can also install it as a PWA for a faster, app-like experience." },
+      { q: "How is my data saved?",             a: "When you sign in, your shop data syncs to your private cloud account and stays cached in this browser. Keep a backup from Data & Backups before moving to another account or device." },
       { q: "How do I print a receipt?",        a: "Open the Billing Terminal, add your items, then click 'Print / PDF'. The receipt will open in your browser's print dialog." },
     ],
     faqTitle: "Frequently Asked Questions",
@@ -43,7 +43,7 @@ const content = {
     faq: [
       { q: "नया उत्पाद कैसे जोड़ें?",           a: "इन्वेंटरी में जाएं → ऊपर दाएं '+' बटन पर क्लिक करें → उत्पाद की जानकारी भरें और सेव करें।" },
       { q: "स्टॉक कैसे कम होता है?",            a: "जब आप बिल फाइनल करते हैं, तो मिलान वाले इन्वेंटरी आइटम का स्टॉक अपने आप कम हो जाता है।" },
-      { q: "क्या यह ऑफलाइन चलता है?",           a: "हाँ! सारा डेटा आपके डिवाइस में सेव होता है। एक बार लोड होने के बाद यह पूरी तरह ऑफलाइन काम करता है।" },
+      { q: "मेरा डेटा कहाँ सेव होता है?",       a: "साइन इन करने पर दुकान का डेटा आपके निजी cloud account में sync होता है और इस browser में भी रहता है। दूसरे device पर जाने से पहले Data & Backups से backup डाउनलोड करें।" },
       { q: "रसीद कैसे प्रिंट करें?",             a: "बिलिंग टर्मिनल खोलें, आइटम जोड़ें, फिर 'Print / PDF' पर क्लिक करें।" },
     ],
     faqTitle: "अक्सर पूछे जाने वाले सवाल",
@@ -65,7 +65,7 @@ const content = {
     faq: [
       { q: "Naya product kaise add karein?",   a: "Inventory mein jao → upar right mein '+' button dabao → product ki details bharo aur save karo." },
       { q: "Stock kaise cut hota hai?",        a: "Jab bill finalize karte ho, toh matching inventory items ka stock apne aap kam ho jaata hai." },
-      { q: "Kya ye offline kaam karta hai?",   a: "Haan! Saara data aapke device mein locally save hota hai. Ek baar load hone ke baad puri tarah offline kaam karta hai. PWA install karke aur bhi fast experience milta hai." },
+      { q: "Mera data kahan save hota hai?",   a: "Sign in karne par shop data aapke private cloud account mein sync hota hai aur is browser mein bhi cached rehta hai. Device ya account badalne se pehle Data & Backups se backup download karo." },
       { q: "Receipt kaise print karein?",      a: "Billing Terminal kholo, items add karo, fir 'Print / PDF' dabao. Receipt browser ke print dialog mein khulegi." },
     ],
     faqTitle: "Aksar Puche Jaane Wale Sawal",

@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Calculator, BookOpen, PackageSearch, BarChart3, Settings, Store, Info, FileText,
-  Menu, X, ChevronLeft, ChevronRight, HelpCircle,
+  Menu, X, ChevronLeft, ChevronRight, HelpCircle, Cloud, LogOut,
 } from "lucide-react";
+import { useClerk } from "@clerk/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { useShopSettings } from "@/lib/useShopSettings";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { signOut } = useClerk();
   const { settings, saveSettings } = useShopSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -25,6 +27,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { path: "/inventory", label: "Inventory", icon: PackageSearch },
     { path: "/invoices", label: "Invoices", icon: FileText },
     { path: "/reports", label: "Reports", icon: BarChart3 },
+    { path: "/account", label: "Data & Backups", icon: Cloud },
     { path: "/khata", label: "Khata Ledger", icon: BookOpen },
   ];
 
@@ -158,6 +161,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <Info size={18} className="flex-shrink-0" />
             <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
               About Developer
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void signOut({ redirectUrl: import.meta.env.BASE_URL || "/" })}
+            title={sidebarCollapsed ? "Sign out" : undefined}
+            className={`flex items-center gap-3 py-2.5 rounded-lg w-full text-slate-500 hover:bg-slate-100/80 hover:text-slate-700 transition-all duration-150
+              ${sidebarCollapsed ? "md:justify-center md:px-0 px-3" : "px-3"}`}
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+            <span className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-200 ${sidebarCollapsed ? "md:hidden" : ""}`}>
+              Sign out
             </span>
           </button>
         </div>

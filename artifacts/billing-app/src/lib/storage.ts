@@ -295,7 +295,11 @@ export const storage = {
     localStorage.setItem('billing_bills', JSON.stringify(snapshot.bills));
     localStorage.setItem('billing_invoice_counter', String(snapshot.invoiceCounter));
     localStorage.setItem('billing_version', STORAGE_VERSION);
-    if (notify) notifyShopDataChanged();
+    if (notify) {
+      notifyShopDataChanged();
+      window.dispatchEvent(new Event("shop-settings-updated"));
+      window.dispatchEvent(new Event("inventory-updated"));
+    }
   },
 };
 

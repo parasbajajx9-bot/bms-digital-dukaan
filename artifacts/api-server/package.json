@@ -8,6 +8,7 @@
     "prebuild": "pnpm --filter @workspace/api-zod run build",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
+    "smoke:db": "esbuild src/shop-data-smoke.test.ts --bundle --platform=node --format=esm --outfile=dist/shop-data-smoke.mjs --banner:js=\"import { createRequire as __bannerCrReq } from 'node:module'; globalThis.require = __bannerCrReq(import.meta.url);\" --external:express --external:@clerk/express && node ./dist/shop-data-smoke.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

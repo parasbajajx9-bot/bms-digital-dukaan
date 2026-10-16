@@ -1,15 +1,13 @@
 ---
 name: BMS Storage Architecture
-description: localStorage-only app; no backend SQL; version key controls clean resets
+description: Owner-scoped PostgreSQL snapshot with browser cache; environment transfers require an explicit backup
 ---
 
-- Storage version key: `billing_version` in localStorage. Current: `"v3"`.
-- Bumping the version (e.g. to `"v4"`) in `storage.ts` clears all keys and forces clean start + onboarding.
-- All data keys: `billing_shopSettings`, `billing_inventory`, `billing_customers`, `billing_transactions`, `billing_bills`, `billing_invoice_counter`.
-- ShopSettings now includes: `monthlyOverhead`, `aiEnabled`, `aiName` (added for BEP calc and AI assistant).
-- Invoice format: `INV-XXXX` (zero-padded 4 digits), counter starts at 100.
-- No backend SQL → SQL injection / IDOR / prepared statements are not applicable.
+- BMS now keeps one owner-scoped cloud snapshot in PostgreSQL and a local browser cache for offline use.
+- Development and production use separate database/auth environments; data does not move between them automatically.
+- Never let an empty cloud account overwrite a populated browser copy. Use the built-in backup export/import for origin or environment transfers.
+- Do not bump the local storage version without a data migration plan; version changes can clear existing shop records.
 
-**Why:** localStorage-only design keeps the app fully offline, zero-hosting-cost, instant load. No auth or server needed.
+**Why:** Existing shop records originated in browser storage, while publishing provisions separate production services. A deliberate backup step is the only safe way to move records across those boundaries.
 
-**How to apply:** Any schema change to ShopSettings requires bumping STORAGE_VERSION and updating DEFAULT_SETTINGS with safe defaults.
+**How to apply:** Keep the local cache and cloud snapshot in sync after sign-in. Before changing storage shape or switching environments, preserve a downloadable backup and apply production schema changes through Replit Publishing.

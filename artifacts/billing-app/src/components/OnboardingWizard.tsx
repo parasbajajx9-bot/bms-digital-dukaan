@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { storage } from "@/lib/storage";
+import { Link } from "wouter";
 
 interface Props {
   onComplete: () => void;
@@ -57,6 +58,11 @@ export function OnboardingWizard({ onComplete }: Props) {
               <Button className="w-full bg-primary text-white font-semibold" onClick={() => setStep(1)}>
                 Get Started <ArrowRight size={16} className="ml-2" />
               </Button>
+              <Link href="/account">
+                <span className="mt-4 block cursor-pointer text-xs font-semibold text-primary hover:underline">
+                  Already have a BMS backup? Restore it first
+                </span>
+              </Link>
             </div>
           )}
 
